@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro</title>
+    <link rel="icon" type="image/png" href="./assets/img/tomato.png">
+    <link rel="stylesheet" href="./assets/css/styles.css">
+</head>
+<body>
+<main>
+    <section class="contenedor">
+        <div class="contenedor-alarma">
+            <div class="info-superior">
+                <div id="mensaje"></div>
+                <div id="circulos"></div>
+            </div>
+            <div id="panelMini">
+                <img src="./assets/img/tomato.png" alt="Dibujo tomate">
+                <div id="contador">25:00</div>
+                <div class="botones">
+                    <button id="iniciar">Iniciar</button>
+                    <button id="pausar">Pausar</button>
+                    <button id="reiniciar">Reiniciar</button>
+                </div>
+            </div>
+            <div class="config-grupo">
+                <div class="configuracion-enfoque">
+                    <span>Enfoque</span>
+                    <button id="menosEnfoque" aria-label="Disminuir tiempo de enfoque">-</button>
+                    <span id="valorEnfoque">25 min</span>
+                    <button id="masEnfoque" aria-label="Aumentar tiempo de enfoque">+</button>
+                </div>
+
+                <div class="configuracion-descanso">
+                    <span>Descanso</span>
+                    <button id="menosDescanso" aria-label="Disminuir tiempo de descanso">-</button>
+                    <span id="valorDescanso">5 min</span>
+                    <button id="masDescanso" aria-label="Aumentar tiempo de descanso">+</button>
+                </div>
+
+                <div class="configuracion-repeticiones">
+                    <span>Repeticiones</span>
+                    <button id="menosRepeticiones" aria-label="Disminuir número de repeticiones">-</button>
+                    <span id="valorRepeticiones">4</span>
+                    <button id="masRepeticiones" aria-label="Aumentar número de repeticiones">+</button>
+                </div>
+            </div>
+            <button id="btnModoMini">Modo mini</button>
+        </div>
+
+    </section>
+</main>
+<script src="./assets/js/app.js"></script>
+</body>
+</html>

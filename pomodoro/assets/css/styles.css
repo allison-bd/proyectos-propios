@@ -1,0 +1,224 @@
+/* ~~~~~~~~~~~~~~~~~~~~~~ RESET Y CONFIGURACIÓN BASE ~~~~~~~~~~~~~~~~~~~~~~ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@font-face {
+    font-family: 'PixeloidMono';
+    src: url('../fonts/PixeloidMono.woff2') format('woff2'),
+    url('../fonts/PixeloidMono.woff') format('woff');
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(236, 48, 63, 0.8);
+    color: rgb(255, 254, 206);
+    font-family: 'PixeloidMono', sans-serif;
+    font-size: 25px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~ LAYOUT GENERAL ~~~~~~~~~~~~~~~~~~~~~~ */
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    height: 100vh;
+    width: 100vw;
+}
+
+.contenedor-alarma {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    position: relative;
+    border: 5px solid rgb(241, 236, 198);
+    box-shadow: 0 0 0 4px rgb(183, 28, 26);
+    background-color: rgb(236, 48, 63);
+    width: 90%;
+    max-width: 580px;
+    padding: 10px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~ MENSAJE Y CÍRCULOS DE PROGRESO ~~~~~~~~~~~~~~~~~~~~~~ */
+.info-superior {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+#mensaje {
+    font-size: 25px;
+    white-space: nowrap;
+}
+
+#circulos {
+    display: flex;
+    gap: 8px;
+}
+
+.punto-ciclo {
+    width: 9px;
+    height: 9px;
+    background-color: transparent;
+    margin-right: 48px;
+    margin-bottom: 48px;
+    box-shadow:
+            16px 0 0 0 rgb(255, 254, 206), 24px 0 0 0 rgb(255, 254, 206), 32px 0 0 0 rgb(255, 254, 206),
+            8px 8px 0 0 rgb(255, 254, 206), 40px 8px 0 0 rgb(255, 254, 206),
+            0 16px 0 0 rgb(255, 254, 206), 48px 16px 0 0 rgb(255, 254, 206),
+            0 24px 0 0 rgb(255, 254, 206), 48px 24px 0 0 rgb(255, 254, 206),
+            0 32px 0 0 rgb(255, 254, 206), 48px 32px 0 0 rgb(255, 254, 206),
+            8px 40px 0 0 rgb(255, 254, 206), 40px 40px 0 0 rgb(255, 254, 206),
+            16px 48px 0 0 rgb(255, 254, 206), 24px 48px 0 0 rgb(255, 254, 206), 32px 48px 0 0 rgb(255, 254, 206);
+}
+
+.punto-ciclo.completado {
+    width: 9px;
+    height: 9px;
+    background-color: transparent;
+    margin-right: 48px;
+    margin-bottom: 48px;
+    box-shadow:
+            16px 0 0 0 rgb(255, 254, 206), 24px 0 0 0 rgb(255, 254, 206), 32px 0 0 0 rgb(255, 254, 206),
+            8px 8px 0 0 rgb(255, 254, 206), 16px 8px 0 0 rgb(255, 254, 206), 24px 8px 0 0 rgb(255, 254, 206), 32px 8px 0 0 rgb(255, 254, 206), 40px 8px 0 0 rgb(255, 254, 206),
+            0 16px 0 0 rgb(255, 254, 206), 8px 16px 0 0 rgb(255, 254, 206), 16px 16px 0 0 rgb(255, 254, 206), 24px 16px 0 0 rgb(255, 254, 206), 32px 16px 0 0 rgb(255, 254, 206), 40px 16px 0 0 rgb(255, 254, 206), 48px 16px 0 0 rgb(255, 254, 206),
+            0 24px 0 0 rgb(255, 254, 206), 8px 24px 0 0 rgb(255, 254, 206), 16px 24px 0 0 rgb(255, 254, 206), 24px 24px 0 0 rgb(255, 254, 206), 32px 24px 0 0 rgb(255, 254, 206), 40px 24px 0 0 rgb(255, 254, 206), 48px 24px 0 0 rgb(255, 254, 206),
+            0 32px 0 0 rgb(255, 254, 206), 8px 32px 0 0 rgb(255, 254, 206), 16px 32px 0 0 rgb(255, 254, 206), 24px 32px 0 0 rgb(255, 254, 206), 32px 32px 0 0 rgb(255, 254, 206), 40px 32px 0 0 rgb(255, 254, 206), 48px 32px 0 0 rgb(255, 254, 206),
+            8px 40px 0 0 rgb(255, 254, 206), 16px 40px 0 0 rgb(255, 254, 206), 24px 40px 0 0 rgb(255, 254, 206), 32px 40px 0 0 rgb(255, 254, 206), 40px 40px 0 0 rgb(255, 254, 206),
+            16px 48px 0 0 rgb(255, 254, 206), 24px 48px 0 0 rgb(255, 254, 206), 32px 48px 0 0 rgb(255, 254, 206);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~ IMAGEN Y CONTADOR ~~~~~~~~~~~~~~~~~~~~~~ */
+img {
+    width: 100px;
+    height: 100px;
+}
+
+#contador{
+    font-size: 50px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~ PANEL MINI (PICTURE-IN-PICTURE) ~~~~~~~~~~~~~~~~~~~~~~ */
+#panelMini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+#btnModoMini {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 20px;
+    background-color: rgb(235, 137, 114);
+    border-color: rgb(235, 137, 114);
+    font-size: 14px;
+    padding: 4px 10px;
+    box-shadow: 2px 2px 0 0 rgb(74 44 36);
+}
+
+#btnModoMini:active {
+    transform: translateX(-50%) translate(2px, 2px);
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~ CONFIGURACIÓN (ENFOQUE / DESCANSO / REPETICIONES) ~~~~~~~~~~~~~~~~~~~~~~ */
+.config-grupo {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    row-gap: 15px;
+    column-gap: 15px;
+    align-items: center;
+}
+
+.configuracion-enfoque,
+.configuracion-descanso,
+.configuracion-repeticiones {
+    display: contents;
+}
+
+span[id^="valor"] {
+    text-align: center;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~ BOTONES ~~~~~~~~~~~~~~~~~~~~~~ */
+.botones {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+button {
+    color: rgb(255, 254, 206);
+    background-color: rgb(176, 188, 106);
+    border: rgb(176, 188, 106) 3px solid;
+    border-radius: 0;
+    box-shadow: 4px 4px 0 0 rgb(77 83 47);
+    padding: 5px 10px;
+    cursor: pointer;
+    font-family: 'PixeloidMono', sans-serif;
+    font-size: 25px;
+}
+
+button:active {
+    transform: translate(4px, 4px);
+}
+
+button[id^="menos"],
+button[id^="mas"] {
+    padding: 4px 10px;
+    font-size: 16px;
+    box-shadow: 2px 2px 0 0 rgb(77 83 47);
+    border-width: 2px;
+}
+
+/* ~~~~~~~~~~~~~~~~~~~~~~ RESPONSIVE (PANTALLAS CHICAS) ~~~~~~~~~~~~~~~~~~~~~~ */
+@media (max-width: 480px) {
+    body {
+        font-size: 16px;
+    }
+
+    #contador {
+        font-size: 32px;
+    }
+
+    .botones {
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    button {
+        font-size: 16px;
+        padding: 4px 8px;
+    }
+
+    button[id^="menos"],
+    button[id^="mas"] {
+        font-size: 12px;
+        padding: 3px 8px;
+    }
+
+    img {
+        width: 60px;
+        height: 60px;
+    }
+}
