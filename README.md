@@ -1,4 +1,10 @@
+<div align="center">
+
 # 🧩 Proyectos Propios
+
+</div>
+
+---
 
 <div align="justify">
 
@@ -8,11 +14,12 @@ Cada proyecto tiene su propia carpeta con su respectivo README donde se explica 
 
 </div>
 
-## 📂 Proyectos
+## 🔗 📂 Proyectos
 
 | Proyecto | Descripción | Demo |
 |----------|-------------|------|
-| [🍅 Pomodoro Timer](./pomodoro) | Temporizador Pomodoro interactivo con estética pixel art | <a href="https://allison-bd.github.io/proyectos-propios/pomodoro/" target="_blank">Ver demo</a> |
+| 🍅 [Pomodoro Timer](./pomodoro) | Temporizador Pomodoro interactivo con estética pixel art | [Ver demo](https://allison-bd.github.io/proyectos-propios/pomodoro/) |
+| 🔴 [Pokédex](./pokedex) | Pokédex interactiva con los 151 pokémon, consumo de PokeAPI y estética pixel art | [Ver demo](https://allison-bd.github.io/proyectos-propios/pokedex/) |
 
 ## 👩‍💻 Autora
 
