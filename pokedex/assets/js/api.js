@@ -1,5 +1,5 @@
 // L4/L5 - Asincronía y consumo de API: todas las peticiones fetch del proyecto.
-import { Pokemon } from "./models/Pokemon.js";
+import { Pokemon } from "./models/pokemon.js";
 
 export async function obtenerPokemon(nombre) {
     try {

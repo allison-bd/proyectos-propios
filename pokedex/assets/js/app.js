@@ -1,6 +1,6 @@
 // L2 - Módulos ES6+
 import { obtenerPokemon, obtenerVariosPokemon, obtenerListaNombres, obtenerInfoEspecie, obtenerLineaEvolutiva, obtenerHabilidadesTraducidas } from "./api.js";
-import { Pokedex } from "./models/Pokedex.js";
+import { Pokedex } from "./models/pokedex.js";
 
 // ~~~~~~~~~~~~~~~~~~~~~~ ESTADO GENERAL ~~~~~~~~~~~~~~~~~~~~~~
 const miPokedex = new Pokedex();
