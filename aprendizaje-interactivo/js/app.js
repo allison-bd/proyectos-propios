@@ -1,7 +1,8 @@
 import { fases, tarjetas as tarjetasBase } from './datos.js';
 import { tarjetas as tarjetasFase1 } from './datos_fase1.js';
+import { tarjetas as tarjetasFase2 } from './datos_fase2.js';
 
-const tarjetas = [...tarjetasBase, ...tarjetasFase1];
+const tarjetas = [...tarjetasBase, ...tarjetasFase1, ...tarjetasFase2];
 const vistaMenu = document.getElementById('vista-menu');
 const vistaEstudio = document.getElementById('vista-estudio');
 const navFases = document.getElementById('nav-fases');
@@ -698,6 +699,91 @@ window.simularPromesa = function(resultado) {
     document.querySelector('[data-estado="rejected"]').classList.add('promesa-activa-rejected');
     codigo.innerHTML = '<span class="code-comment">// El servidor no respondió (está caído, o la URL no existe)</span>\n<span class="code-keyword">try</span> {\n  <span class="code-keyword">const</span> respuesta = <span class="code-keyword">await</span> <span class="code-method">fetch</span>(<span class="code-string">\'https://api.ejemplo.com/usuarios\'</span>);\n} <span class="code-keyword">catch</span> (error) {\n  <span class="code-comment">// La promesa fue "rechazada" (rejected)</span>\n  <span class="code-comment">// El error cae aquí dentro del catch</span>\n  console.<span class="code-method">log</span>(error.message);\n}';
     salida.innerHTML = '<span style="color:#DC6B6B;">Error: "No se pudo conectar al servidor"</span>\n\n<span class="code-comment">// Promesa rechazada</span>\n<span class="code-comment">// El catch capturó el error para que la app no se rompa</span>';
+  }
+};
+
+// --- Tarjeta: URL interactiva ---
+window.mostrarParteUrl = function(parte) {
+  const partes = document.querySelectorAll('.url-parte');
+  const desc = document.getElementById('url-desc');
+
+  partes.forEach(p => {
+    p.style.background = 'transparent';
+    p.style.padding = '0.15rem 0.1rem';
+  });
+
+  const seleccionada = document.querySelector('[data-url="' + parte + '"]');
+  seleccionada.style.background = 'rgba(255,255,255,0.15)';
+  seleccionada.style.padding = '0.15rem 0.4rem';
+
+  const descripciones = {
+    protocolo: '<strong style="color:#C9A0DC;">Protocolo</strong> — Las reglas de comunicación. <code>https</code> significa que los datos viajan cifrados (seguros). <code>http</code> sin la "s" es sin cifrar.',
+    dominio: '<strong style="color:#A6C58C;">Dominio</strong> — El nombre del servidor al que te conectas. El navegador lo traduce a una dirección IP numérica para encontrar el computador en internet.',
+    ruta: '<strong style="color:#E6B980;">Ruta (path)</strong> — La dirección interna dentro del servidor. Le dice qué recurso o función ejecutar. Es lo que Express lee para decidir qué hacer.',
+    params: '<strong style="color:#D4976C;">Query params</strong> — Datos extra para filtrar o modificar la petición. Van después del <code>?</code> como pares <code>clave=valor</code> separados por <code>&</code>.'
+  };
+
+  desc.innerHTML = descripciones[parte] || '';
+  desc.classList.remove('opacity-0');
+};
+
+// --- Tarjeta: Códigos de estado ---
+window.mostrarCodigo = function(codigo) {
+  const desc = document.getElementById('codigo-desc');
+
+  const codigos = {
+    200: { color: '#339933', nombre: '200 OK', texto: 'Todo bien. El servidor procesó la petición y devuelve los datos.', ejemplo: 'Abres tu perfil de Instagram → el servidor responde con tu información.' },
+    201: { color: '#339933', nombre: '201 Created', texto: 'Se creó un recurso nuevo con éxito.', ejemplo: 'Publicas una foto → el servidor la guarda y confirma con 201.' },
+    301: { color: '#5B8BD4', nombre: '301 Moved Permanently', texto: 'El recurso se movió a otra URL. El navegador redirige automáticamente.', ejemplo: 'Una tienda cambia de dominio → te redirige al nuevo sin que hagas nada.' },
+    400: { color: '#E6B980', nombre: '400 Bad Request', texto: 'La petición tiene algo mal: datos incompletos, formato inválido.', ejemplo: 'Envías un formulario de registro sin completar el email → el servidor rechaza.' },
+    404: { color: '#E6B980', nombre: '404 Not Found', texto: 'El recurso que pediste no existe en el servidor.', ejemplo: 'Escribes una URL con un error de tipeo → la página no existe.' },
+    500: { color: '#DC6B6B', nombre: '500 Internal Server Error', texto: 'El servidor falló internamente. El problema no es tuyo, es del servidor.', ejemplo: 'El servidor pierde conexión con la base de datos → no puede procesar tu petición.' }
+  };
+
+  const c = codigos[codigo];
+  desc.innerHTML = '<div style="border-left:3px solid ' + c.color + ';padding:0.75rem 1rem;border-radius:0 0.5rem 0.5rem 0;background:white;"><p style="font-weight:700;color:' + c.color + ';margin-bottom:0.25rem;">' + c.nombre + '</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">' + c.texto + '</p><p style="font-size:0.8rem;opacity:0.7;font-style:italic;">' + c.ejemplo + '</p></div>';
+};
+
+// --- Tarjeta: Content-Type ---
+window.mostrarContentType = function(tipo) {
+  const resultado = document.getElementById('content-type-resultado');
+
+  const tipos = {
+    html: { header: 'text/html', desc: 'El navegador recibe HTML y lo renderiza como una página web visual: botones, texto, imágenes.', ejemplo: '<pre class="bloque-codigo mt-2"><code>res.<span class="code-method">setHeader</span>(<span class="code-string">\'Content-Type\'</span>, <span class="code-string">\'text/html\'</span>);\nres.<span class="code-method">end</span>(<span class="code-string">\'&lt;h1&gt;Hola&lt;/h1&gt;\'</span>);</code></pre>' },
+    json: { header: 'application/json', desc: 'El navegador recibe datos estructurados (JSON). No los muestra como página: los procesa con JavaScript.', ejemplo: '<pre class="bloque-codigo mt-2"><code>res.<span class="code-method">setHeader</span>(<span class="code-string">\'Content-Type\'</span>, <span class="code-string">\'application/json\'</span>);\nres.<span class="code-method">end</span>(JSON.<span class="code-method">stringify</span>({ nombre: <span class="code-string">\'Ana\'</span> }));</code></pre>' },
+    plain: { header: 'text/plain', desc: 'El navegador muestra texto sin formato, tal cual. Sin colores, sin estructura, sin botones.', ejemplo: '<pre class="bloque-codigo mt-2"><code>res.<span class="code-method">setHeader</span>(<span class="code-string">\'Content-Type\'</span>, <span class="code-string">\'text/plain\'</span>);\nres.<span class="code-method">end</span>(<span class="code-string">\'OK\'</span>);</code></pre>' }
+  };
+
+  const t = tipos[tipo];
+  resultado.innerHTML = '<div style="text-align:center;"><p style="font-weight:700;font-family:\'JetBrains Mono\',monospace;margin-bottom:0.5rem;">' + t.header + '</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">' + t.desc + '</p>' + t.ejemplo + '</div>';
+};
+
+// --- Tarjeta: Servidor http — piezas del código ---
+window.explicarPieza = function(pieza) {
+  const desc = document.getElementById('pieza-desc');
+
+  const piezas = {
+    createServer: '<strong><code>http.createServer(callback)</code></strong><br>Crea una instancia de un servidor web. Recibe una función (callback) que se ejecutará automáticamente <strong>cada vez</strong> que un cliente haga una petición.',
+    req: '<strong><code>req</code></strong> (request / petición)<br>Un objeto que contiene toda la información que el cliente envió: la URL que pidió, el método HTTP (GET, POST...), las cabeceras y el cuerpo si lo hay.',
+    res: '<strong><code>res</code></strong> (response / respuesta)<br>Un objeto vacío que Node te da para que <strong>construyas</strong> la respuesta: fijar el código de estado, las cabeceras y el contenido.',
+    end: '<strong><code>res.end(texto)</code></strong><br>Envía el contenido al cliente y <strong>cierra la conexión</strong>. Si no lo llamas, el navegador se queda esperando indefinidamente.',
+    listen: '<strong><code>server.listen(puerto, callback)</code></strong><br>Pone al servidor a escuchar peticiones en ese puerto. El callback se ejecuta una sola vez cuando el servidor arranca correctamente.'
+  };
+
+  desc.innerHTML = '<div style="text-align:left;font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);">' + piezas[pieza] + '</div>';
+};
+
+// --- Tarjeta: JSON — stringify y parse ---
+window.simularJson = function(metodo) {
+  const codigo = document.getElementById('json-codigo');
+  const resultado = document.getElementById('json-resultado');
+
+  if (metodo === 'stringify') {
+    codigo.innerHTML = '<span class="code-comment">// Tienes un objeto JavaScript en memoria</span>\n<span class="code-keyword">const</span> usuario = {\n  nombre: <span class="code-string">\'Ana\'</span>,\n  edad: <span class="code-number">25</span>,\n  activo: <span class="code-keyword">true</span>\n};\n\n<span class="code-comment">// Lo conviertes a texto JSON para enviarlo por la red</span>\n<span class="code-keyword">const</span> texto = JSON.<span class="code-method">stringify</span>(usuario);\nconsole.<span class="code-method">log</span>(texto);';
+    resultado.innerHTML = '<span style="color:#A6C58C;">\'{"nombre":"Ana","edad":25,"activo":true}\'</span>\n\n<span class="code-comment">// Ahora es un string (texto). Puede viajar por HTTP.</span>\n<span class="code-comment">// Las claves tienen comillas dobles obligatorias.</span>';
+  } else {
+    codigo.innerHTML = '<span class="code-comment">// Recibes texto JSON del servidor</span>\n<span class="code-keyword">const</span> texto = <span class="code-string">\'{"nombre":"Ana","edad":25,"activo":true}\'</span>;\n\n<span class="code-comment">// Lo conviertes a objeto JavaScript para poder usarlo</span>\n<span class="code-keyword">const</span> usuario = JSON.<span class="code-method">parse</span>(texto);\nconsole.<span class="code-method">log</span>(usuario.nombre);';
+    resultado.innerHTML = '<span style="color:#A6C58C;">Ana</span>\n\n<span class="code-comment">// Ahora es un objeto. Puedes acceder a .nombre, .edad, etc.</span>\n<span class="code-comment">// Sin parse, usuario.nombre daría undefined.</span>';
   }
 };
 
