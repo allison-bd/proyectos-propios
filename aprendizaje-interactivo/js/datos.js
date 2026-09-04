@@ -2,10 +2,14 @@ export const fases = [
   { id: 0, titulo: "Herramientas del proyecto", descripcion: "Gestores de paquetes, package.json, semver, scripts, lockfiles y estructura del proyecto.", icono: "wrench" },
   { id: 1, titulo: "Cimientos de JS en el servidor", descripcion: "Modularización, asincronía, Node.js, event loop y módulos nativos.", icono: "cube" },
   { id: 2, titulo: "Red y servidor nativo", descripcion: "Ciclo Request-Response, cabeceras, servidor con node:http y códigos de estado.", icono: "globe" },
-  { id: 3, titulo: "Express.js", descripcion: "Enrutamiento, middlewares, motor de plantillas EJS y manejo de errores.", icono: "bolt" },
-  { id: 4, titulo: "Arquitectura y APIs", descripcion: "Operaciones CRUD, arquitectura de capas, rutas REST y formularios.", icono: "layers" },
-  { id: 5, titulo: "Persistencia y ORM", descripcion: "Persistencia en archivos con fs y Sequelize: modelos, migraciones, transacciones.", icono: "database" },
-  { id: 6, titulo: "Seguridad y producción", descripcion: "Variables de entorno, dotenv, NODE_ENV y autenticación JWT.", icono: "shield" },
+  { id: 3, titulo: "Express.js", descripcion: "Enrutamiento, middlewares, motores de plantillas, validación con Joi y consumo de APIs con axios.", icono: "bolt" },
+  { id: 4, titulo: "Persistencia en archivos planos", descripcion: "Guardar y leer datos en archivos JSON: CRUD sin base de datos, logs y manipulación de texto.", icono: "document" },
+  { id: 5, titulo: "Bases de datos con PostgreSQL", descripcion: "Conexión, consultas SQL, prevención de inyecciones y transacciones con propiedades ACID.", icono: "database" },
+  { id: 6, titulo: "ORM con Sequelize", descripcion: "Modelos, clases ES6, operaciones CRUD y relaciones 1:1, 1:N y N:M sin escribir SQL a mano.", icono: "link" },
+  { id: 7, titulo: "Diseño de APIs REST", descripcion: "Principios REST, códigos de estado, versionamiento y respuestas estandarizadas.", icono: "layers" },
+  { id: 8, titulo: "Subida de archivos", descripcion: "Recibir, validar y eliminar archivos en el servidor con express-fileupload.", icono: "upload" },
+  { id: 9, titulo: "Autenticación con JWT", descripcion: "Tokens, firmas digitales y middlewares para proteger rutas.", icono: "shield" },
+  { id: 10, titulo: "Procesos, escalabilidad y producción", descripcion: "Clustering, balanceo de carga, PM2 y manejo de errores en producción.", icono: "server" },
 ];
 
 export const tarjetas = [
@@ -91,7 +95,7 @@ export const tarjetas = [
 
   // === FASE 4: Verbos HTTP y CRUD ===
   {
-    fase: 4, titulo: "Verbos HTTP y CRUD", menuTitulo: "Verbos HTTP y CRUD",
+    fase: 7, titulo: "Verbos HTTP y CRUD", menuTitulo: "Verbos HTTP y CRUD",
     capas: [
       { nombre: "¿Qué es?", contenido: `<p class="mb-6">CRUD son las cuatro operaciones básicas con un dato. Cada una tiene un <strong>verbo HTTP</strong>: la "palabra de acción" que el cliente envía al servidor.</p><table><thead><tr><th>CRUD</th><th>Verbo HTTP</th><th>Qué hace</th></tr></thead><tbody><tr><td><strong>C</strong>reate</td><td><code>POST</code></td><td>Crear un recurso nuevo</td></tr><tr><td><strong>R</strong>ead</td><td><code>GET</code></td><td>Consultar recursos</td></tr><tr><td><strong>U</strong>pdate</td><td><code>PUT</code> / <code>PATCH</code></td><td>Modificar un recurso</td></tr><tr><td><strong>D</strong>elete</td><td><code>DELETE</code></td><td>Borrar un recurso</td></tr></tbody></table><div class="recuadro-resaltado mt-6">La misma URL (<code>/usuarios</code>) sirve para las cuatro. Lo que cambia es el verbo: <strong>enrutamiento semántico</strong>.</div>` },
       { nombre: "El código por dentro", contenido: `<pre class="bloque-codigo"><code><span class="code-keyword">import</span> express <span class="code-keyword">from</span> <span class="code-string">'express'</span>;\n<span class="code-keyword">const</span> app = <span class="code-method">express</span>();\napp.<span class="code-method">use</span>(express.<span class="code-method">json</span>());\n\n<span class="code-keyword">let</span> usuarios = [{ id: <span class="code-number">1</span>, nombre: <span class="code-string">'Ana'</span> }];\n\n<span class="code-comment">// READ</span>\napp.<span class="code-method">get</span>(<span class="code-string">'/usuarios'</span>, (req, res) => {\n  res.<span class="code-method">json</span>(usuarios);\n});\n\n<span class="code-comment">// CREATE</span>\napp.<span class="code-method">post</span>(<span class="code-string">'/usuarios'</span>, (req, res) => {\n  <span class="code-keyword">const</span> nuevo = req.body;\n  nuevo.id = usuarios.length + <span class="code-number">1</span>;\n  usuarios.<span class="code-method">push</span>(nuevo);\n  res.<span class="code-method">status</span>(<span class="code-number">201</span>).<span class="code-method">json</span>(nuevo);\n});</code></pre><table class="mt-6"><thead><tr><th>Pieza</th><th>Qué es</th></tr></thead><tbody><tr><td><code>app.get</code> / <code>app.post</code></td><td>"Cuando llegue este verbo a esta URL, ejecuta esta función"</td></tr><tr><td><code>(req, res)</code></td><td>Parámetros del callback. <code>req</code> = petición. <code>res</code> = respuesta.</td></tr><tr><td><code>req.body</code></td><td>Los datos que mandó el cliente.</td></tr><tr><td><code>res.status(201)</code></td><td>Código de estado (201 = creado).</td></tr><tr><td><code>res.json()</code></td><td>Envía la respuesta como JSON.</td></tr></tbody></table>` },

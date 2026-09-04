@@ -1,8 +1,9 @@
 import { fases, tarjetas as tarjetasBase } from './datos.js';
 import { tarjetas as tarjetasFase1 } from './datos_fase1.js';
 import { tarjetas as tarjetasFase2 } from './datos_fase2.js';
+import { tarjetas as tarjetasFase3 } from './datos_fase3.js';
 
-const tarjetas = [...tarjetasBase, ...tarjetasFase1, ...tarjetasFase2];
+const tarjetas = [...tarjetasBase, ...tarjetasFase1, ...tarjetasFase2, ...tarjetasFase3];
 const vistaMenu = document.getElementById('vista-menu');
 const vistaEstudio = document.getElementById('vista-estudio');
 const navFases = document.getElementById('nav-fases');
@@ -21,6 +22,10 @@ const iconos = {
   layers: '<path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"/>',
   database: '<path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/>',
   shield: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>',
+  document: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>',
+  link: '<path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>',
+  upload: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 7.5m0 0L7.5 12m4.5-4.5v13.5"/>',
+  server: '<path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0a3 3 0 0 0-3-3H5.25a3 3 0 0 0-3 3m16.5 0h.008v.008h-.008v-.008Zm-3 0h.008v.008h-.008v-.008Z"/>',
 };
 
 const flechaIzq = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>';
@@ -785,6 +790,115 @@ window.simularJson = function(metodo) {
     codigo.innerHTML = '<span class="code-comment">// Recibes texto JSON del servidor</span>\n<span class="code-keyword">const</span> texto = <span class="code-string">\'{"nombre":"Ana","edad":25,"activo":true}\'</span>;\n\n<span class="code-comment">// Lo conviertes a objeto JavaScript para poder usarlo</span>\n<span class="code-keyword">const</span> usuario = JSON.<span class="code-method">parse</span>(texto);\nconsole.<span class="code-method">log</span>(usuario.nombre);';
     resultado.innerHTML = '<span style="color:#A6C58C;">Ana</span>\n\n<span class="code-comment">// Ahora es un objeto. Puedes acceder a .nombre, .edad, etc.</span>\n<span class="code-comment">// Sin parse, usuario.nombre daría undefined.</span>';
   }
+};
+
+// --- Tarjeta: ¿Qué es Express? — revelar problemas ---
+window.revelarExpress = function(idx) {
+  const item = document.querySelector('[data-cap="e' + idx + '"]');
+  const icono = item.querySelector('.cap-icono');
+  item.classList.add('cap-revelada');
+  icono.textContent = '✓';
+  item.querySelector('.cap-texto').style.color = '#33402A';
+
+  const detalle = document.getElementById('express-detalle');
+  const detalles = [
+    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><strong>node:http:</strong> programar if/else manual para cada URL y cada método.<br><strong>Express:</strong> una línea: <code>app.get(\'/usuarios\', fn)</code></div>',
+    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><strong>node:http:</strong> capturar bytes fragmentados, unirlos y convertirlos a JSON manualmente.<br><strong>Express:</strong> una línea: <code>app.use(express.json())</code> y los datos están en <code>req.body</code></div>',
+    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><strong>node:http:</strong> fijar statusCode, setHeader, end() todo a mano.<br><strong>Express:</strong> una línea: <code>res.json(datos)</code> (fija headers, status y cierra)</div>',
+    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><strong>node:http:</strong> copiar y pegar la validación dentro de cada if/else.<br><strong>Express:</strong> <code>app.use(miMiddleware)</code> se ejecuta para todas las rutas automáticamente</div>'
+  ];
+  detalle.innerHTML = detalles[idx];
+};
+
+// --- Tarjeta: Servidor Express — comparar con node:http ---
+window.compararServidor = function(tipo) {
+  const btnNativo = document.getElementById('btn-nativo');
+  const btnExpress = document.getElementById('btn-express');
+  const codigo = document.getElementById('comparar-codigo');
+
+  btnNativo.classList.toggle('simbolo-activo', tipo === 'nativo');
+  btnNativo.classList.toggle('simbolo-inactivo', tipo !== 'nativo');
+  btnExpress.classList.toggle('simbolo-activo', tipo === 'express');
+  btnExpress.classList.toggle('simbolo-inactivo', tipo !== 'express');
+
+  if (tipo === 'nativo') {
+    codigo.innerHTML = '<span class="code-keyword">import</span> http <span class="code-keyword">from</span> <span class="code-string">\'node:http\'</span>;\n\n<span class="code-keyword">const</span> server = http.<span class="code-method">createServer</span>((req, res) => {\n  <span class="code-comment">// Tienes que verificar la URL manualmente</span>\n  <span class="code-keyword">if</span> (req.url === <span class="code-string">\'/\'</span> && req.method === <span class="code-string">\'GET\'</span>) {\n    res.statusCode = <span class="code-number">200</span>;\n    res.<span class="code-method">setHeader</span>(<span class="code-string">\'Content-Type\'</span>, <span class="code-string">\'text/plain\'</span>);\n    res.<span class="code-method">end</span>(<span class="code-string">\'Hola\'</span>);\n  }\n});\n\nserver.<span class="code-method">listen</span>(<span class="code-number">3000</span>);';
+  } else {
+    codigo.innerHTML = '<span class="code-keyword">import</span> express <span class="code-keyword">from</span> <span class="code-string">\'express\'</span>;\n\n<span class="code-keyword">const</span> app = <span class="code-method">express</span>();\n\n<span class="code-comment">// Express filtra método + URL automáticamente</span>\napp.<span class="code-method">get</span>(<span class="code-string">\'/\'</span>, (req, res) => {\n  res.<span class="code-method">send</span>(<span class="code-string">\'Hola\'</span>);\n});\n\napp.<span class="code-method">listen</span>(<span class="code-number">3000</span>);';
+  }
+};
+
+// --- Tarjeta: Rutas — comparar params vs query ---
+window.compararParams = function(tipo) {
+  const btnParams = document.getElementById('btn-params');
+  const btnQuery = document.getElementById('btn-query');
+  const codigo = document.getElementById('params-codigo');
+  const resultado = document.getElementById('params-resultado');
+
+  btnParams.classList.toggle('simbolo-activo', tipo === 'params');
+  btnParams.classList.toggle('simbolo-inactivo', tipo !== 'params');
+  btnQuery.classList.toggle('simbolo-activo', tipo === 'query');
+  btnQuery.classList.toggle('simbolo-inactivo', tipo !== 'query');
+
+  if (tipo === 'params') {
+    codigo.innerHTML = '<span class="code-comment">// Los :id en la ruta son variables (obligatorias)</span>\napp.<span class="code-method">get</span>(<span class="code-string">\'/productos/:id\'</span>, (req, res) => {\n  <span class="code-comment">// Express captura el valor que el cliente puso en esa posición</span>\n  <span class="code-keyword">const</span> id = req.params.id;\n  res.<span class="code-method">send</span>(<span class="code-string">`Producto con ID: ${id}`</span>);\n});';
+    resultado.innerHTML = '<span class="code-comment">// Cliente visita: /productos/45</span>\n<span style="color:#A6C58C;">req.params → { id: \'45\' }</span>\n\n<span class="code-comment">// El valor siempre llega como string</span>\n<span class="code-comment">// Si necesitas un número, usa parseInt(req.params.id)</span>';
+  } else {
+    codigo.innerHTML = '<span class="code-comment">// La ruta es fija. Los filtros van después del ?</span>\napp.<span class="code-method">get</span>(<span class="code-string">\'/productos\'</span>, (req, res) => {\n  <span class="code-comment">// Express extrae los pares clave=valor del ? automáticamente</span>\n  <span class="code-keyword">const</span> color = req.query.color;\n  <span class="code-keyword">const</span> orden = req.query.orden;\n  res.<span class="code-method">send</span>(<span class="code-string">`Filtrando por ${color}, orden ${orden}`</span>);\n});';
+    resultado.innerHTML = '<span class="code-comment">// Cliente visita: /productos?color=rojo&orden=precio</span>\n<span style="color:#A6C58C;">req.query → { color: \'rojo\', orden: \'precio\' }</span>\n\n<span class="code-comment">// Son opcionales: si el cliente no los envía, son undefined</span>';
+  }
+};
+
+// --- Tarjeta: Middlewares — cadena paso a paso ---
+window.avanzarCadena = function(paso) {
+  const pasos = document.querySelectorAll('.flujo-paso');
+  pasos.forEach((p, i) => {
+    if (i < paso) {
+      p.classList.add('flujo-completado');
+      p.classList.remove('flujo-pendiente', 'flujo-activo');
+    } else if (i === paso) {
+      p.classList.add('flujo-activo');
+      p.classList.remove('flujo-pendiente', 'flujo-completado');
+    } else {
+      p.classList.add('flujo-pendiente');
+      p.classList.remove('flujo-activo', 'flujo-completado');
+    }
+  });
+};
+
+// --- Tarjeta: EJS — mostrar etiquetas ---
+window.mostrarEjs = function(tipo) {
+  const btnSalida = document.getElementById('btn-ejs-salida');
+  const btnControl = document.getElementById('btn-ejs-control');
+  const ejemplo = document.getElementById('ejs-ejemplo');
+
+  btnSalida.classList.toggle('simbolo-activo', tipo === 'salida');
+  btnSalida.classList.toggle('simbolo-inactivo', tipo !== 'salida');
+  btnControl.classList.toggle('simbolo-activo', tipo === 'control');
+  btnControl.classList.toggle('simbolo-inactivo', tipo !== 'control');
+
+  if (tipo === 'salida') {
+    ejemplo.innerHTML = '<p style="font-weight:600;margin-bottom:0.5rem;">Etiqueta de salida: <code>&lt;%= %&gt;</code></p><p style="font-size:0.85rem;margin-bottom:0.75rem;">Evalúa la expresión y la <strong>imprime</strong> en el HTML final.</p><pre class="bloque-codigo"><code><span class="code-comment">&lt;!-- En perfil.ejs (servidor) --&gt;</span>\n&lt;h1&gt;Bienvenido, <span style="color:#E6B980;">&lt;%= nombre %&gt;</span>&lt;/h1&gt;</code></pre><div class="consola-simulada mt-3"><div class="consola-header">HTML que recibe el navegador</div><pre style="margin:0;background:transparent;padding:0;font-size:inherit;line-height:inherit;"><span style="color:#A6C58C;">&lt;h1&gt;Bienvenido, Carlos&lt;/h1&gt;</span>\n\n<span class="code-comment">// El navegador nunca ve &lt;%= %&gt;</span>\n<span class="code-comment">// Solo recibe HTML puro con el dato ya insertado</span></pre></div>';
+  } else {
+    ejemplo.innerHTML = '<p style="font-weight:600;margin-bottom:0.5rem;">Etiqueta de control: <code>&lt;% %&gt;</code></p><p style="font-size:0.85rem;margin-bottom:0.75rem;">Ejecuta lógica (if, for) pero <strong>no imprime nada</strong> en el HTML.</p><pre class="bloque-codigo"><code><span class="code-comment">&lt;!-- En perfil.ejs (servidor) --&gt;</span>\n<span style="color:#E6B980;">&lt;% if (nombre) { %&gt;</span>\n  &lt;p&gt;Usuario autenticado&lt;/p&gt;\n<span style="color:#E6B980;">&lt;% } %&gt;</span></code></pre><div class="consola-simulada mt-3"><div class="consola-header">HTML que recibe el navegador</div><pre style="margin:0;background:transparent;padding:0;font-size:inherit;line-height:inherit;"><span style="color:#A6C58C;">&lt;p&gt;Usuario autenticado&lt;/p&gt;</span>\n\n<span class="code-comment">// El if desaparece completamente</span>\n<span class="code-comment">// Solo llega el HTML que la condición decidió incluir</span></pre></div>';
+  }
+};
+
+// --- Tarjeta: Manejo de errores — flujo de orden ---
+window.avanzarOrdenError = function(paso) {
+  const pasos = document.querySelectorAll('.flujo-paso');
+  pasos.forEach((p, i) => {
+    if (i < paso) {
+      p.classList.add('flujo-completado');
+      p.classList.remove('flujo-pendiente', 'flujo-activo');
+    } else if (i === paso) {
+      p.classList.add('flujo-activo');
+      p.classList.remove('flujo-pendiente', 'flujo-completado');
+    } else {
+      p.classList.add('flujo-pendiente');
+      p.classList.remove('flujo-activo', 'flujo-completado');
+    }
+  });
 };
 
 renderizarMenu();
