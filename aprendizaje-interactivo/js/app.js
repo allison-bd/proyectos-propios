@@ -22,17 +22,17 @@ let tarjetaActiva = null;
 let pasoActual = 0;
 
 const iconos = {
-  wrench: '<path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z"/>',
-  cube: '<path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9"/>',
-  globe: '<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5a17.92 17.92 0 0 1-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"/>',
-  bolt: '<path stroke-linecap="round" stroke-linejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z"/>',
-  layers: '<path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"/>',
-  database: '<path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/>',
-  shield: '<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>',
-  document: '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>',
-  link: '<path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"/>',
-  upload: '<path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 7.5m0 0L7.5 12m4.5-4.5v13.5"/>',
-  server: '<path stroke-linecap="round" stroke-linejoin="round" d="M21.75 17.25v-.228a4.5 4.5 0 0 0-.12-1.03l-2.268-9.64a3.375 3.375 0 0 0-3.285-2.602H7.923a3.375 3.375 0 0 0-3.285 2.602l-2.268 9.64a4.5 4.5 0 0 0-.12 1.03v.228m19.5 0a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3m19.5 0a3 3 0 0 0-3-3H5.25a3 3 0 0 0-3 3m16.5 0h.008v.008h-.008v-.008Zm-3 0h.008v.008h-.008v-.008Z"/>',
+  wrench: '<circle cx="6" cy="6" r="3.4" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><circle cx="14" cy="14" r="3.4" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><line x1="8.3" y1="8.3" x2="11.7" y2="11.7" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/>',
+  cube: '<rect x="4" y="4" width="12" height="12" rx="2" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><path d="M4 8h12" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/>',
+  globe: '<circle cx="10" cy="10" r="7" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><path d="M3 10h14M10 3c2.5 2 2.5 12 0 14M10 3c-2.5 2-2.5 12 0 14" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.2"/>',
+  bolt: '<path d="M4 4l6 6-4 6M12 4l4 4-3 8" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6" stroke-linejoin="round"/>',
+  document: '<rect x="5" y="3" width="10" height="14" rx="2" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><path d="M7.5 7h5M7.5 10.5h5M7.5 14h3" stroke="rgba(51,153,51,.75)" stroke-width="1.4"/>',
+  database: '<ellipse cx="10" cy="6" rx="6" ry="2.4" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><path d="M4 6v8c0 1.3 2.7 2.4 6 2.4s6-1.1 6-2.4V6" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/>',
+  link: '<circle cx="6" cy="6" r="2.6" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><circle cx="14" cy="14" r="2.6" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><path d="M8 8l4 4" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/>',
+  layers: '<rect x="4" y="4" width="6" height="6" rx="1.5" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><rect x="10" y="10" width="6" height="6" rx="1.5" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/>',
+  upload: '<path d="M10 4v9M6 9l4 4 4-4" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 16h12" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/>',
+  shield: '<path d="M10 3l6 3v4c0 4-2.7 6.5-6 7-3.3-.5-6-3-6-7V6z" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6" stroke-linejoin="round"/>',
+  server: '<rect x="4" y="5" width="12" height="4" rx="1.5" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/><rect x="4" y="11" width="12" height="4" rx="1.5" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="1.6"/>',
 };
 
 const flechaIzq = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>';
@@ -40,7 +40,7 @@ const flechaDer = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke
 const iconoCheck = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
 
 function renderizarIcono(nombre) {
-  return `<svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">${iconos[nombre] || iconos.cube}</svg>`;
+  return `<svg width="20" height="20" viewBox="0 0 20 20">${iconos[nombre] || iconos.wrench}</svg>`;
 }
 
 function mostrarMenu() {
@@ -64,15 +64,16 @@ function renderizarMenu() {
     let subItems = '';
     if (esFaseActiva && tieneTarjetas) {
       subItems = `
-        <div class="px-4 pb-4 pt-3 space-y-2 border-t border-verde-oscuro/5">
+        <div class="grid grid-cols-2 gap-2 px-4 pb-4 pt-3 border-t border-white/50">
           ${tarjetasDeFase.map((t, idx) => `
             <button
               data-tarjeta-nav="${idx}"
-              class="tarjeta-nav-btn w-full flex items-center gap-3 text-left px-3 py-2.5 rounded-xl bg-crema border border-verde-oscuro/5 text-sm transition-all
-                text-verde-oscuro/80 hover:border-verde-node/30 hover:bg-verde-node/5"
-            >
-              <span class="w-6 h-6 rounded-full bg-verde-node text-white text-[0.65rem] font-bold flex items-center justify-center shrink-0">${String(idx + 1).padStart(2, '0')}</span>
-              <span>${t.menuTitulo || t.titulo}</span>
+              class="tarjeta-nav-btn flex items-center gap-2.5 text-left px-3 py-2.5 rounded-[11px]
+                bg-white/50 backdrop-blur-[8px] border border-white/60 text-[12.5px] font-semibold text-verde-oscuro
+                transition-all hover:bg-white/70 hover:border-verde-node/40">
+              <span class="w-6 h-6 rounded-full bg-[#7ED17E]/55 backdrop-blur-[6px] border border-[#7ED17E]/65 text-[#1a4d1a] text-[0.65rem] font-bold flex items-center justify-center shrink-0">${String(idx + 1).padStart(2, '0')}</span>
+              <span class="truncate">${t.menuTitulo || t.titulo}</span>
+
             </button>
           `).join('')}
         </div>
@@ -80,24 +81,24 @@ function renderizarMenu() {
     }
 
     return `
-      <div class="bg-white rounded-xl border border-verde-oscuro/10 overflow-hidden">
+      <div class="rounded-[20px] overflow-hidden bg-white/40 backdrop-blur-[14px] border border-white/60 shadow-[0_8px_24px_-12px_rgba(51,64,42,0.18)]">
         <button
           data-fase="${fase.id}"
-          class="fase-btn w-full flex items-center gap-3 p-4 text-left transition-colors
-            ${esFaseActiva ? 'bg-verde-node/5' : 'hover:bg-verde-oscuro/[0.02]'}"
+          class="fase-btn w-full flex items-center gap-3.5 p-3.5 text-left transition-colors
+            ${esFaseActiva ? 'bg-white/15' : 'hover:bg-white/10'}"
         >
-          <div class="w-10 h-10 rounded-xl ${esFaseActiva ? 'bg-verde-node/15 text-verde-node' : 'bg-verde-oscuro/5 text-verde-oscuro/50'} flex items-center justify-center shrink-0">
+          <div class="w-11 h-11 rounded-2xl bg-white/55 border border-white/70 flex items-center justify-center shrink-0">
             ${renderizarIcono(fase.icono)}
           </div>
           <span class="leading-snug flex-1 min-w-0">
-            <span class="block text-xs ${esFaseActiva ? 'text-verde-node/60' : 'text-verde-oscuro/40'} font-semibold">Fase ${fase.id}</span>
-            <span class="block font-titulo font-semibold text-sm ${esFaseActiva ? 'text-verde-node' : 'text-verde-oscuro'}">${fase.titulo}</span>
-            <span class="block text-xs text-verde-oscuro/40 font-normal mt-0.5 leading-relaxed">${fase.descripcion}</span>
+            <span class="block text-[10px] font-mono font-semibold text-verde-oscuro/45">FASE ${fase.id}</span>
+            <span class="block font-titulo font-bold text-sm text-verde-oscuro">${fase.titulo}</span>
+            <span class="block text-xs text-verde-oscuro/45 font-normal mt-0.5 leading-relaxed">${fase.descripcion}</span>
           </span>
           ${!tieneTarjetas
-            ? '<span class="text-[0.6rem] bg-amarillo text-amarillo-texto px-1.5 py-0.5 rounded-full font-semibold shrink-0">Pronto</span>'
-            : `<svg class="w-4 h-4 shrink-0 transition-transform ${esFaseActiva ? 'rotate-90' : ''} text-verde-oscuro/30" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/></svg>`
-          }
+        ? '<span class="text-[0.6rem] bg-[#FCE7A8]/70 text-[#7A5B00] px-2 py-0.5 rounded-full font-bold shrink-0">Pronto</span>'
+        : `<svg class="w-4 h-4 shrink-0 transition-transform duration-200 ${esFaseActiva ? 'rotate-90' : ''} text-verde-oscuro/40" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/></svg>`
+    }
         </button>
         ${subItems}
       </div>
@@ -122,23 +123,23 @@ function actualizarVista() {
   const nombreCapa = esEjercicio ? 'Ponlo a prueba' : tarjeta.capas[pasoActual].nombre;
 
   headerFase.innerHTML = `
-    <div class="flex items-center gap-2 px-4 py-3">
-      <button class="btn-retroceder w-10 h-10 rounded-full border border-verde-oscuro/20 flex items-center justify-center transition-colors hover:bg-verde-oscuro/5 shrink-0">
+    <div class="flex items-center gap-3.5 px-4 py-3">
+      <button class="btn-retroceder w-[42px] h-[42px] rounded-full bg-white/55 backdrop-blur-[12px] border border-white/75 flex items-center justify-center shrink-0 transition-colors hover:bg-white/75">
         ${flechaIzq}
       </button>
       <div class="flex items-center gap-1.5 flex-1 mx-2">
         ${Array.from({ length: total }, (_, i) => `
-          <div class="flex-1 h-2.5 rounded-full transition-colors ${i <= pasoActual ? 'bg-verde-node' : 'bg-verde-oscuro/15'}"></div>
+          <div class="flex-1 h-2 rounded-full transition-colors ${i <= pasoActual ? 'bg-[#2E852E]/60' : 'bg-white/50'} ${i === pasoActual ? 'ring-4 ring-[#2E852E]/25' : ''}"></div>
         `).join('')}
       </div>
       ${esUltimoDeUltima
-        ? `<button class="btn-avanzar w-10 h-10 rounded-full bg-amarillo text-amarillo-texto flex items-center justify-center shrink-0">${iconoCheck}</button>`
-        : `<button class="btn-avanzar w-10 h-10 rounded-full bg-verde-node text-white flex items-center justify-center transition-colors hover:bg-verde-node/90 shrink-0">${flechaDer}</button>`
-      }
+      ? `<button class="btn-avanzar w-[42px] h-[42px] rounded-full bg-[#FCE7A8]/70 backdrop-blur-[12px] border border-[#FCE7A8]/80 text-[#7A5B00] flex items-center justify-center shrink-0">${iconoCheck}</button>`
+      : `<button class="btn-avanzar w-[42px] h-[42px] rounded-full bg-white/55 backdrop-blur-[12px] border border-white/75 flex items-center justify-center transition-colors hover:bg-white/75 shrink-0">${flechaDer}</button>`
+  }
     </div>
     <div class="text-center pb-3">
       <h3 class="font-titulo font-bold text-base text-verde-oscuro">${tarjeta.titulo}</h3>
-      <p class="text-xs font-semibold text-verde-node">${nombreCapa}</p>
+      <p class="text-xs font-bold text-[#2E852E]">${nombreCapa}</p>
     </div>
   `;
 

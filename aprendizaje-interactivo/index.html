@@ -17,7 +17,7 @@
       theme: {
         extend: {
           colors: {
-            crema: '#FBF5E9',
+            crema: '#EFE8D6',
             'verde-node': '#339933',
             'verde-oscuro': '#33402A',
             amarillo: '#FCE7A8',
@@ -40,16 +40,19 @@
   <!-- Custom styles -->
   <link rel="stylesheet" href="css/estilos.css">
 </head>
-<body class="bg-crema font-lectura text-verde-oscuro min-h-screen">
+<body class="bg-crema font-lectura text-verde-oscuro min-h-screen overflow-x-hidden">
 
   <!-- Vista 1: Menú de navegación -->
+  <div class="fixed -top-[10%] -left-[8%] w-[420px] h-[420px] rounded-full bg-[#7ED17E] blur-[90px] opacity-[0.45] pointer-events-none"></div>
+  <div class="fixed -bottom-[12%] -right-[8%] w-[460px] h-[460px] rounded-full bg-[#FCE7A8] blur-[95px] opacity-[0.55] pointer-events-none"></div>
+  <div class="fixed top-[35%] right-[5%] w-[320px] h-[320px] rounded-full bg-[#B8DDF0] blur-[80px] opacity-[0.4] pointer-events-none"></div>
   <div id="vista-menu" class="min-h-screen flex flex-col items-center px-4 pt-8 pb-12">
     <div class="max-w-4xl w-full">
       <!-- Logo y título -->
       <div class="text-center mb-10">
-        <div class="w-14 h-14 bg-verde-node rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 1.85c-.27 0-.55.07-.78.2l-7.44 4.3c-.48.28-.78.8-.78 1.36v8.58c0 .56.3 1.08.78 1.36l1.95 1.12c.95.46 1.27.46 1.71.46 1.4 0 2.21-.85 2.21-2.33V8.44c0-.12-.1-.22-.22-.22H8.5c-.13 0-.23.1-.23.22v8.47c0 .66-.68 1.31-1.77.76L4.45 16.5a.26.26 0 0 1-.12-.21V7.71c0-.09.04-.17.12-.21l7.44-4.3c.09-.04.2-.04.28 0l7.44 4.3c.08.04.12.12.12.21v8.58c0 .08-.04.17-.12.21l-7.44 4.3c-.08.04-.18.04-.27 0l-1.88-1.12c-.07-.04-.17-.05-.25-.01-.68.31-.81.35-1.46.53-.16.04-.4.12.09.35l2.45 1.45c.24.14.51.21.78.21.27 0 .54-.07.78-.2l7.44-4.3c.48-.28.78-.8.78-1.36V7.71c0-.56-.3-1.08-.78-1.36l-7.44-4.3c-.23-.13-.5-.2-.78-.2z"/>
+        <div class="w-16 h-16 rounded-[20px] bg-white/50 backdrop-blur-[14px] border border-white/70 shadow-[0_10px_26px_-12px_rgba(51,64,42,0.22)] flex items-center justify-center mx-auto mb-3.5">
+          <svg width="28" height="28" viewBox="0 0 28 28">
+            <path d="M14 4l10 5.5v9L14 24 4 18.5v-9z" fill="none" stroke="rgba(51,153,51,.75)" stroke-width="2" stroke-linejoin="round"/>
           </svg>
         </div>
         <h1 class="font-titulo font-bold text-2xl text-verde-oscuro">Guía de estudio</h1>
