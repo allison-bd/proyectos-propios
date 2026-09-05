@@ -2,8 +2,15 @@ import { fases, tarjetas as tarjetasBase } from './datos.js';
 import { tarjetas as tarjetasFase1 } from './datos_fase1.js';
 import { tarjetas as tarjetasFase2 } from './datos_fase2.js';
 import { tarjetas as tarjetasFase3 } from './datos_fase3.js';
+import { tarjetas as tarjetasFase4 } from './datos_fase4.js';
+import { tarjetas as tarjetasFase5 } from './datos_fase5.js';
+import { tarjetas as tarjetasFase6 } from './datos_fase6.js';
+import { tarjetas as tarjetasFase7 } from './datos_fase7.js';
+import { tarjetas as tarjetasFase8 } from './datos_fase8.js';
+import { tarjetas as tarjetasFase9 } from './datos_fase9.js';
+import { tarjetas as tarjetasFase10 } from './datos_fase10.js';
 
-const tarjetas = [...tarjetasBase, ...tarjetasFase1, ...tarjetasFase2, ...tarjetasFase3];
+const tarjetas = [...tarjetasBase, ...tarjetasFase1, ...tarjetasFase2, ...tarjetasFase3, ...tarjetasFase4, ...tarjetasFase5, ...tarjetasFase6, ...tarjetasFase7, ...tarjetasFase8, ...tarjetasFase9, ...tarjetasFase10];
 const vistaMenu = document.getElementById('vista-menu');
 const vistaEstudio = document.getElementById('vista-estudio');
 const navFases = document.getElementById('nav-fases');
@@ -899,6 +906,1054 @@ window.avanzarOrdenError = function(paso) {
       p.classList.remove('flujo-activo', 'flujo-completado');
     }
   });
+};
+
+// --- Event Loop: flujo paso a paso ---
+window.avanzarEventLoop = function(paso) {
+  const pasos = document.querySelectorAll('.flujo-paso');
+  pasos.forEach((p, i) => {
+    if (i < paso) {
+      p.classList.add('flujo-completado');
+      p.classList.remove('flujo-pendiente', 'flujo-activo');
+    } else if (i === paso) {
+      p.classList.add('flujo-activo');
+      p.classList.remove('flujo-pendiente', 'flujo-completado');
+    } else {
+      p.classList.add('flujo-pendiente');
+      p.classList.remove('flujo-activo', 'flujo-completado');
+    }
+  });
+};
+
+// --- Hilo principal vs Thread Pool ---
+window.compararHilos = function(tipo) {
+  const btnPrincipal = document.getElementById('btn-hilo-principal');
+  const btnPool = document.getElementById('btn-thread-pool');
+  const resultado = document.getElementById('hilos-resultado');
+
+  btnPrincipal.classList.toggle('simbolo-activo', tipo === 'principal');
+  btnPrincipal.classList.toggle('simbolo-inactivo', tipo !== 'principal');
+  btnPool.classList.toggle('simbolo-activo', tipo === 'pool');
+  btnPool.classList.toggle('simbolo-inactivo', tipo !== 'pool');
+
+  if (tipo === 'principal') {
+    resultado.innerHTML = '<div style="text-align:center;padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Hilo principal</p><p style="font-size:0.85rem;">Ejecuta todo tu código JavaScript y tus rutas de Express, <strong>de forma secuencial</strong>, una línea a la vez.</p><p style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Si aquí se bloquea algo, se bloquea toda la aplicación.</p></div>';
+  } else {
+    resultado.innerHTML = '<div style="text-align:center;padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Thread Pool</p><p style="font-size:0.85rem;">Hilos auxiliares (administrados por <strong>libuv</strong>) que corren en paralelo, fuera del hilo principal, para tareas pesadas como <code>crypto</code> o ciertas operaciones de <code>fs</code>.</p><p style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Al terminar, avisan al Event Loop para que ponga el callback en la cola.</p></div>';
+  }
+};
+
+// --- Callback Hell: mostrar solución ---
+window.mostrarSolucion = function(tipo) {
+  const btnPromesas = document.getElementById('btn-promesas');
+  const btnAsync = document.getElementById('btn-asyncawait');
+  const codigo = document.getElementById('solucion-codigo');
+
+  btnPromesas.classList.toggle('simbolo-activo', tipo === 'promesas');
+  btnPromesas.classList.toggle('simbolo-inactivo', tipo !== 'promesas');
+  btnAsync.classList.toggle('simbolo-activo', tipo === 'asyncawait');
+  btnAsync.classList.toggle('simbolo-inactivo', tipo !== 'asyncawait');
+
+  if (tipo === 'promesas') {
+    codigo.innerHTML = '<span class="code-comment">// Cadena plana con .then(), un solo .catch() al final</span>\n<span class="code-method">buscarUsuario</span>(id)\n  .<span class="code-method">then</span>(usuario => <span class="code-method">obtenerPermisos</span>(usuario.rol))\n  .<span class="code-method">then</span>(permisos => <span class="code-method">consultarHistorial</span>(id))\n  .<span class="code-method">then</span>(historial => <span class="code-method">guardarLog</span>(id))\n  .<span class="code-method">then</span>(() => console.<span class="code-method">log</span>(<span class="code-string">\'Listo\'</span>))\n  .<span class="code-method">catch</span>(err => <span class="code-method">manejarError</span>(err));';
+  } else {
+    codigo.innerHTML = '<span class="code-comment">// Se lee como código síncrono normal</span>\n<span class="code-keyword">async function</span> <span class="code-method">procesar</span>(id) {\n  <span class="code-keyword">try</span> {\n    <span class="code-keyword">const</span> usuario = <span class="code-keyword">await</span> <span class="code-method">buscarUsuario</span>(id);\n    <span class="code-keyword">const</span> permisos = <span class="code-keyword">await</span> <span class="code-method">obtenerPermisos</span>(usuario.rol);\n    <span class="code-keyword">const</span> historial = <span class="code-keyword">await</span> <span class="code-method">consultarHistorial</span>(id);\n    <span class="code-keyword">await</span> <span class="code-method">guardarLog</span>(id);\n    console.<span class="code-method">log</span>(<span class="code-string">\'Listo\'</span>);\n  } <span class="code-keyword">catch</span> (err) {\n    <span class="code-method">manejarError</span>(err);\n  }\n}';
+  }
+};
+
+// --- Partials, layouts, helpers ---
+window.mostrarPlantilla = function(tipo) {
+  const btns = document.querySelectorAll('[data-plantilla]');
+  const desc = document.getElementById('plantilla-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-plantilla="' + tipo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    partial: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Partial</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Un fragmento de HTML reutilizable. Se guarda una sola vez y se inserta donde se necesite.</p><p style="font-size:0.8rem;opacity:0.7;">Ejemplos típicos: <code>header.hbs</code>, <code>footer.hbs</code></p></div>',
+    layout: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Layout</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">La estructura completa del documento (&lt;html&gt;, &lt;head&gt;, enlaces a CSS). Cada vista se inyecta automáticamente dentro de él.</p><p style="font-size:0.8rem;opacity:0.7;">Evita repetir el esqueleto HTML en cada página.</p></div>',
+    helper: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Helper</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Una función de JavaScript que registras en el motor de plantillas para llamarla directamente desde el HTML de la vista.</p><p style="font-size:0.8rem;opacity:0.7;">Ejemplo: una función que convierte texto a mayúsculas antes de mostrarlo.</p></div>'
+  };
+
+  desc.innerHTML = datos[tipo];
+};
+
+// --- Joi: probar validación ---
+window.probarJoi = function(caso) {
+  const resultado = document.getElementById('joi-resultado');
+
+  const casos = [
+    { valido: true, mensaje: 'Válido. Todos los campos cumplen las reglas: nombre tiene al menos 2 caracteres, email tiene formato válido, edad es un número entero ≥ 18.', status: '201 Created' },
+    { valido: false, mensaje: 'Rechazado. El campo "email" no tiene formato de correo válido (falta el @ y dominio esperado por .email()).', status: '400 Bad Request' },
+    { valido: false, mensaje: 'Rechazado. El campo "edad" es 15, pero el schema exige .min(18).', status: '400 Bad Request' }
+  ];
+
+  const c = casos[caso];
+  const color = c.valido ? '#339933' : '#DC6B6B';
+  const bg = c.valido ? 'rgba(51,153,51,0.08)' : 'rgba(220,107,107,0.08)';
+
+  resultado.innerHTML = '<div style="border-left:3px solid ' + color + ';padding:0.75rem 1rem;background:' + bg + ';border-radius:0 0.5rem 0.5rem 0;"><p style="font-weight:700;color:' + color + ';margin-bottom:0.35rem;">' + c.status + '</p><p style="font-size:0.85rem;">' + c.mensaje + '</p></div>';
+};
+
+// --- axios vs fetch ---
+window.compararAxios = function(tipo) {
+  const btnFetch = document.getElementById('btn-fetch');
+  const btnAxios = document.getElementById('btn-axios');
+  const codigo = document.getElementById('axios-codigo');
+
+  btnFetch.classList.toggle('simbolo-activo', tipo === 'fetch');
+  btnFetch.classList.toggle('simbolo-inactivo', tipo !== 'fetch');
+  btnAxios.classList.toggle('simbolo-activo', tipo === 'axios');
+  btnAxios.classList.toggle('simbolo-inactivo', tipo !== 'axios');
+
+  if (tipo === 'fetch') {
+    codigo.innerHTML = '<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> <span class="code-method">fetch</span>(url);\n\n<span class="code-comment">// fetch NO revisa el código de estado por ti</span>\n<span class="code-keyword">if</span> (!response.ok) {\n  <span class="code-comment">// tienes que verificarlo manualmente</span>\n  <span class="code-keyword">throw new</span> Error(<span class="code-string">\'Algo falló\'</span>);\n}\n\n<span class="code-comment">// segundo paso obligatorio para obtener los datos</span>\n<span class="code-keyword">const</span> datos = <span class="code-keyword">await</span> response.<span class="code-method">json</span>();';
+  } else {
+    codigo.innerHTML = '<span class="code-keyword">const</span> response = <span class="code-keyword">await</span> axios.<span class="code-method">get</span>(url);\n\n<span class="code-comment">// Si el código NO es 2xx, la promesa se rechaza sola</span>\n<span class="code-comment">// (cae directo al catch, sin código extra)</span>\n\n<span class="code-comment">// Los datos ya vienen parseados, listos para usar</span>\n<span class="code-keyword">const</span> datos = response.data;';
+  }
+};
+
+// --- Tarjeta 2: writeFileSync / readFileSync ---
+window.mostrarFsMetodo = function(metodo) {
+  const btnWrite = document.getElementById('btn-write');
+  const btnRead = document.getElementById('btn-read');
+  const desc = document.getElementById('fs-metodo-desc');
+
+  btnWrite.classList.toggle('simbolo-activo', metodo === 'write');
+  btnWrite.classList.toggle('simbolo-inactivo', metodo !== 'write');
+  btnRead.classList.toggle('simbolo-activo', metodo === 'read');
+  btnRead.classList.toggle('simbolo-inactivo', metodo !== 'read');
+
+  if (metodo === 'write') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;font-family:\'JetBrains Mono\',monospace;">fs.writeFileSync(path, data, options)</p><ul style="padding-left:1.1rem;list-style:disc;"><li><code>path</code>: la ruta donde se crea o sobrescribe el archivo</li><li><code>data</code>: el texto a guardar (normalmente el resultado de JSON.stringify)</li><li><code>options</code>: la codificación, típicamente \'utf8\'</li></ul><p style="margin-top:0.5rem;opacity:0.7;">Devuelve <code>undefined</code>. Si el archivo no existe, lo crea. Si existe, reemplaza TODO su contenido.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;font-family:\'JetBrains Mono\',monospace;">fs.readFileSync(path, options)</p><ul style="padding-left:1.1rem;list-style:disc;"><li><code>path</code>: la ruta del archivo a leer</li><li><code>options</code>: \'utf8\' para obtener texto legible</li></ul><p style="margin-top:0.5rem;opacity:0.7;">Sin \'utf8\', devuelve un <strong>Buffer</strong> (datos binarios), no texto. Con \'utf8\', devuelve un <strong>string</strong> que hay que pasar por JSON.parse() para volver a tener un objeto.</p></div>';
+  }
+};
+
+// --- Tarjeta 3: ciclo CRUD ---
+window.avanzarCicloCrud = function(paso) {
+  const pasos = document.querySelectorAll('.flujo-paso');
+  pasos.forEach((p, i) => {
+    if (i < paso) {
+      p.classList.add('flujo-completado');
+      p.classList.remove('flujo-pendiente', 'flujo-activo');
+    } else if (i === paso) {
+      p.classList.add('flujo-activo');
+      p.classList.remove('flujo-pendiente', 'flujo-completado');
+    } else {
+      p.classList.add('flujo-pendiente');
+      p.classList.remove('flujo-activo', 'flujo-completado');
+    }
+  });
+};
+
+// --- Tarjeta 3: las 4 operaciones CRUD ---
+window.mostrarCrudArchivo = function(op) {
+  const btns = document.querySelectorAll('[data-crud]');
+  const codigo = document.getElementById('crud-archivo-codigo');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-crud="' + op + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const codigos = {
+    create: '<span class="code-keyword">const</span> usuarios = <span class="code-method">obtenerDatos</span>();\n<span class="code-keyword">const</span> nuevo = { id: <span class="code-number">3</span>, nombre: <span class="code-string">\'Laura\'</span> };\n\nusuarios.<span class="code-method">push</span>(nuevo);        <span class="code-comment">// modificación en memoria</span>\n<span class="code-method">guardarDatos</span>(usuarios);  <span class="code-comment">// escritura en disco</span>',
+    read: '<span class="code-keyword">const</span> usuarios = <span class="code-method">obtenerDatos</span>();\n<span class="code-keyword">const</span> encontrado = usuarios.<span class="code-method">find</span>(u => u.id === <span class="code-number">3</span>);\n\n<span class="code-comment">// encontrado = el objeto, o undefined si no existe</span>\n<span class="code-comment">// find() no modifica el archivo, solo busca</span>',
+    update: '<span class="code-keyword">const</span> usuarios = <span class="code-method">obtenerDatos</span>();\n<span class="code-keyword">const</span> aEditar = usuarios.<span class="code-method">find</span>(u => u.id === <span class="code-number">3</span>);\n\n<span class="code-keyword">if</span> (aEditar) {\n  aEditar.rol = <span class="code-string">\'diseñadora\'</span>;  <span class="code-comment">// modifica por referencia</span>\n  <span class="code-method">guardarDatos</span>(usuarios);   <span class="code-comment">// guarda el arreglo completo</span>\n}',
+    delete: '<span class="code-keyword">const</span> usuarios = <span class="code-method">obtenerDatos</span>();\n\n<span class="code-comment">// filter crea un arreglo NUEVO sin el id buscado</span>\n<span class="code-keyword">const</span> filtrados = usuarios.<span class="code-method">filter</span>(u => u.id !== <span class="code-number">3</span>);\n\n<span class="code-method">guardarDatos</span>(filtrados);  <span class="code-comment">// sobrescribe con el arreglo limpio</span>'
+  };
+
+  codigo.innerHTML = codigos[op];
+};
+
+// --- Tarjeta 4: unlinkSync vs appendFileSync ---
+window.mostrarUnlinkAppend = function(metodo) {
+  const btns = document.querySelectorAll('[data-metodo2]');
+  const desc = document.getElementById('unlink-append-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-metodo2="' + metodo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  if (metodo === 'unlink') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;">fs.unlinkSync(path)</p><p>Elimina el archivo <strong>de forma permanente e irreversible</strong> del disco.</p><p style="margin-top:0.5rem;opacity:0.7;">Siempre verifica con fs.existsSync() antes, o lanzará ENOENT si el archivo ya no existe.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;">fs.appendFileSync(path, data)</p><p>Agrega texto <strong>al final</strong> del archivo, sin borrar lo que ya había. Si el archivo no existe, lo crea.</p><p style="margin-top:0.5rem;opacity:0.7;">Es la base de los sistemas de logs: cada evento nuevo se suma, nunca reemplaza al anterior.</p></div>';
+  }
+};
+
+// --- Tarjeta 6: sync vs async en un servidor ---
+window.compararSyncServidor = function(tipo) {
+  const btnSync = document.getElementById('btn-sync-servidor');
+  const btnAsync = document.getElementById('btn-async-servidor');
+  const resultado = document.getElementById('sync-servidor-resultado');
+
+  btnSync.classList.toggle('simbolo-activo', tipo === 'sync');
+  btnSync.classList.toggle('simbolo-inactivo', tipo !== 'sync');
+  btnAsync.classList.toggle('simbolo-activo', tipo === 'async');
+  btnAsync.classList.toggle('simbolo-inactivo', tipo !== 'async');
+
+  if (tipo === 'sync') {
+    resultado.innerHTML = '<div style="padding:1rem;background:rgba(220,107,107,0.06);border-radius:0.5rem;border:1px solid rgba(220,107,107,0.2);font-size:0.85rem;line-height:1.7;"><p>1. Cliente A pide un archivo de 50MB con <code>readFileSync</code></p><p>2. El Event Loop se <strong style="color:#DC6B6B;">congela por completo</strong> hasta que termine</p><p>3. Clientes B, C y D llegan mientras tanto</p><p style="margin-top:0.5rem;color:#8B3A3A;font-weight:600;">→ B, C y D esperan en cola. Sufren latencia extrema o timeout.</p></div>';
+  } else {
+    resultado.innerHTML = '<div style="padding:1rem;background:rgba(51,153,51,0.06);border-radius:0.5rem;border:1px solid rgba(51,153,51,0.2);font-size:0.85rem;line-height:1.7;"><p>1. Cliente A pide el mismo archivo con <code>await fs.promises.readFile()</code></p><p>2. Node delega la lectura al <strong>Worker Pool</strong> (libuv) y el Event Loop queda libre</p><p>3. Clientes B, C y D llegan mientras tanto</p><p style="margin-top:0.5rem;color:#2D5A1E;font-weight:600;">→ B, C y D se atienden de inmediato. Cuando el disco termina, A recibe su respuesta.</p></div>';
+  }
+};
+
+// --- Tarjeta 6: comparar sintaxis sync vs fs.promises ---
+window.compararCodigoFs = function(tipo) {
+  const btnSync = document.getElementById('btn-codigo-sync');
+  const btnAsync = document.getElementById('btn-codigo-async');
+  const codigo = document.getElementById('fs-comparar-codigo');
+
+  btnSync.classList.toggle('simbolo-activo', tipo === 'sync');
+  btnSync.classList.toggle('simbolo-inactivo', tipo !== 'sync');
+  btnAsync.classList.toggle('simbolo-activo', tipo === 'async');
+  btnAsync.classList.toggle('simbolo-inactivo', tipo !== 'async');
+
+  if (tipo === 'sync') {
+    codigo.innerHTML = '<span class="code-keyword">import</span> fs <span class="code-keyword">from</span> <span class="code-string">\'node:fs\'</span>;\n\n<span class="code-keyword">try</span> {\n  <span class="code-comment">// El hilo se congela aquí hasta terminar de leer</span>\n  <span class="code-keyword">const</span> texto = fs.<span class="code-method">readFileSync</span>(<span class="code-string">\'./config.json\'</span>, <span class="code-string">\'utf8\'</span>);\n  <span class="code-keyword">const</span> config = JSON.<span class="code-method">parse</span>(texto);\n  console.<span class="code-method">log</span>(config);\n} <span class="code-keyword">catch</span> (error) {\n  console.<span class="code-method">error</span>(error.message);\n}';
+  } else {
+    codigo.innerHTML = '<span class="code-keyword">import</span> fs <span class="code-keyword">from</span> <span class="code-string">\'node:fs/promises\'</span>;\n\n<span class="code-keyword">async function</span> <span class="code-method">cargarConfig</span>() {\n  <span class="code-keyword">try</span> {\n    <span class="code-comment">// El hilo queda libre mientras el disco trabaja</span>\n    <span class="code-keyword">const</span> texto = <span class="code-keyword">await</span> fs.<span class="code-method">readFile</span>(<span class="code-string">\'./config.json\'</span>, <span class="code-string">\'utf8\'</span>);\n    <span class="code-keyword">const</span> config = JSON.<span class="code-method">parse</span>(texto);\n    console.<span class="code-method">log</span>(config);\n  } <span class="code-keyword">catch</span> (error) {\n    console.<span class="code-method">error</span>(error.message);\n  }\n}\n\n<span class="code-method">cargarConfig</span>();';
+  }
+};
+
+// --- Tarjeta 1: Client vs Pool ---
+window.compararClientPool = function(tipo) {
+  const btnClient = document.getElementById('btn-client');
+  const btnPool = document.getElementById('btn-pool');
+  const resultado = document.getElementById('client-pool-resultado');
+
+  btnClient.classList.toggle('simbolo-activo', tipo === 'client');
+  btnClient.classList.toggle('simbolo-inactivo', tipo !== 'client');
+  btnPool.classList.toggle('simbolo-activo', tipo === 'pool');
+  btnPool.classList.toggle('simbolo-inactivo', tipo !== 'pool');
+
+  if (tipo === 'client') {
+    resultado.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Client</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Un único canal de conexión. Abres con <code>.connect()</code>, consultas, cierras con <code>.end()</code>.</p><p style="font-size:0.8rem;color:#8B3A3A;">Problema: crear y destruir una conexión TCP en cada petición HTTP es costoso. Además, no atiende peticiones en paralelo.</p></div>';
+  } else {
+    resultado.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Pool</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Mantiene varias conexiones activas. Cada consulta toma prestado un cliente y lo devuelve al terminar.</p><p style="font-size:0.8rem;color:#2D5A1E;">Ventaja: evita el costo de crear conexiones nuevas constantemente, y limita cuántas conexiones simultáneas se abren.</p></div>';
+  }
+};
+
+// --- Tarjeta 2: propiedades del objeto Result ---
+window.mostrarResultProp = function(prop) {
+  const btns = document.querySelectorAll('[data-result]');
+  const desc = document.getElementById('result-prop-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-result="' + prop + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    rows: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.rows</p><p>Un arreglo de objetos. Cada objeto es una fila, y sus propiedades son los nombres de las columnas que pediste en el SELECT.</p></div>',
+    rowCount: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.rowCount</p><p>Un número: cuántas filas devolvió el SELECT, o cuántas se modificaron con INSERT/UPDATE/DELETE.</p></div>',
+    fields: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.fields</p><p>Metadatos de las columnas: nombre, tipo de dato en PostgreSQL, etc. Se usa poco en el día a día.</p></div>'
+  };
+
+  desc.innerHTML = datos[prop];
+};
+
+// --- Tarjeta 3: comparar concatenación vs parametrizada ---
+window.compararInjection = function(tipo) {
+  const btnVuln = document.getElementById('btn-vulnerable');
+  const btnSeg = document.getElementById('btn-segura');
+  const codigo = document.getElementById('injection-codigo');
+  const resultado = document.getElementById('injection-resultado');
+
+  btnVuln.classList.toggle('simbolo-activo', tipo === 'vulnerable');
+  btnVuln.classList.toggle('simbolo-inactivo', tipo !== 'vulnerable');
+  btnSeg.classList.toggle('simbolo-activo', tipo === 'segura');
+  btnSeg.classList.toggle('simbolo-inactivo', tipo !== 'segura');
+
+  if (tipo === 'vulnerable') {
+    codigo.innerHTML = '<span class="code-comment">// El valor se concatena directo dentro del SQL</span>\n<span class="code-keyword">const</span> query = \'SELECT * FROM usuarios WHERE email = \\\'\' + email + \'\\\'\';\n<span class="code-keyword">const</span> resultado = <span class="code-keyword">await</span> pool.<span class="code-method">query</span>(query);';
+    resultado.innerHTML = '<div style="padding:0.75rem 1rem;background:rgba(220,107,107,0.08);border-left:3px solid #DC6B6B;border-radius:0 0.5rem 0.5rem 0;font-size:0.85rem;">Si alguien escribe <code>x@test.com\' OR \'1\'=\'1</code> como email, la consulta final se vuelve: <code>WHERE email = \'x@test.com\' OR \'1\'=\'1\'</code>. Eso es siempre verdadero: <strong>devuelve TODOS los usuarios</strong>.</div>';
+  } else {
+    codigo.innerHTML = '<span class="code-comment">// El valor viaja separado, nunca se mezcla con el SQL</span>\n<span class="code-keyword">const</span> query = \'SELECT * FROM usuarios WHERE email = $1\';\n<span class="code-keyword">const</span> resultado = <span class="code-keyword">await</span> pool.<span class="code-method">query</span>(query, [email]);';
+    resultado.innerHTML = '<div style="padding:0.75rem 1rem;background:rgba(51,153,51,0.08);border-left:3px solid #339933;border-radius:0 0.5rem 0.5rem 0;font-size:0.85rem;">Aunque alguien escriba <code>x@test.com\' OR \'1\'=\'1</code>, PostgreSQL lo trata como <strong>un solo valor literal</strong>. Busca ese texto exacto como email y no encuentra nada.</div>';
+  }
+};
+
+// --- Tarjeta 4: INSERT, UPDATE, DELETE ---
+window.mostrarSqlOp = function(op) {
+  const btns = document.querySelectorAll('[data-sql]');
+  const codigo = document.getElementById('sql-op-codigo');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-sql="' + op + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const codigos = {
+    insert: '<span class="code-keyword">const</span> query = \'INSERT INTO tokens_sesion (token, expiracion) VALUES ($1, $2)\';\n<span class="code-keyword">const</span> valores = [\'token_abc123\', \'2026-09-04 23:59:59\'];\n\n<span class="code-keyword">await</span> pool.<span class="code-method">query</span>(query, valores);',
+    update: '<span class="code-comment">// Siempre con WHERE, o se actualizan TODOS los registros</span>\n<span class="code-keyword">const</span> query = \'UPDATE tokens_sesion SET activo = $1 WHERE id = $2\';\n<span class="code-keyword">const</span> valores = [<span class="code-keyword">false</span>, <span class="code-number">45</span>];\n\n<span class="code-keyword">await</span> pool.<span class="code-method">query</span>(query, valores);',
+    delete: '<span class="code-keyword">const</span> query = \'DELETE FROM tokens_sesion WHERE id = $1\';\n\n<span class="code-keyword">await</span> pool.<span class="code-method">query</span>(query, [<span class="code-number">45</span>]);'
+  };
+
+  codigo.innerHTML = codigos[op];
+};
+
+// --- Tarjeta 5: ACID ---
+window.mostrarAcid = function(letra) {
+  const btns = document.querySelectorAll('[data-acid]');
+  const desc = document.getElementById('acid-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-acid="' + letra + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    a: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.4rem;">Atomicidad</p><p style="font-size:0.85rem;">O se aplican todas las consultas del bloque, o no se aplica ninguna. Todo o nada.</p></div>',
+    c: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.4rem;">Consistencia</p><p style="font-size:0.85rem;">La transacción solo lleva la base de datos de un estado válido a otro, respetando todas las reglas del esquema.</p></div>',
+    i: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.4rem;">Aislamiento</p><p style="font-size:0.85rem;">Una transacción en curso no interfiere ni es visible para otras transacciones que corren al mismo tiempo.</p></div>',
+    d: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.4rem;">Durabilidad</p><p style="font-size:0.85rem;">Una vez confirmada (COMMIT), los cambios sobreviven incluso si el servidor se cae justo después.</p></div>'
+  };
+
+  desc.innerHTML = datos[letra];
+};
+
+// --- Tarjeta 5: flujo de transacción ---
+window.avanzarTransaccion = function(paso) {
+  const pasos = document.querySelectorAll('.flujo-paso');
+  pasos.forEach((p, i) => {
+    if (i < paso) {
+      p.classList.add('flujo-completado');
+      p.classList.remove('flujo-pendiente', 'flujo-activo');
+    } else if (i === paso) {
+      p.classList.add('flujo-activo');
+      p.classList.remove('flujo-pendiente', 'flujo-completado');
+    } else {
+      p.classList.add('flujo-pendiente');
+      p.classList.remove('flujo-activo', 'flujo-completado');
+    }
+  });
+};
+
+// --- Tarjeta 6: backoff progresivo ---
+window.mostrarBackoff = function(intento) {
+  const resultado = document.getElementById('backoff-resultado');
+  const tiempos = { 1: '1 segundo', 2: '2 segundos', 3: '4 segundos', 4: '8 segundos' };
+  const colores = { 1: '#E6B980', 2: '#E6B980', 3: '#DC6B6B', 4: '#DC6B6B' };
+
+  resultado.innerHTML = '<span style="color:' + colores[intento] + ';">Intento ' + intento + ' falla → se espera ' + tiempos[intento] + ' antes del siguiente</span>';
+};
+
+// --- Tarjeta 1: pg puro vs Sequelize ---
+window.compararOrm = function(tipo) {
+  const btnPg = document.getElementById('btn-pg');
+  const btnSeq = document.getElementById('btn-sequelize');
+  const codigo = document.getElementById('orm-codigo');
+
+  btnPg.classList.toggle('simbolo-activo', tipo === 'pg');
+  btnPg.classList.toggle('simbolo-inactivo', tipo !== 'pg');
+  btnSeq.classList.toggle('simbolo-activo', tipo === 'sequelize');
+  btnSeq.classList.toggle('simbolo-inactivo', tipo !== 'sequelize');
+
+  if (tipo === 'pg') {
+    codigo.innerHTML = '<span class="code-keyword">const</span> query = \'INSERT INTO usuarios (nombre, email) VALUES ($1, $2) RETURNING *\';\n<span class="code-keyword">const</span> res = <span class="code-keyword">await</span> pool.<span class="code-method">query</span>(query, [\'Luis\', \'luis@example.com\']);\n<span class="code-keyword">const</span> nuevoUsuario = res.rows;';
+  } else {
+    codigo.innerHTML = '<span class="code-keyword">const</span> nuevoUsuario = <span class="code-keyword">await</span> Usuario.<span class="code-method">create</span>({\n  nombre: \'Luis\',\n  email: \'luis@example.com\'\n});\n\n<span class="code-comment">// Sequelize genera el SQL parametrizado por ti</span>';
+  }
+};
+
+// --- Tarjeta 2: conceptos de clases ---
+window.mostrarConceptoClase = function(concepto) {
+  const btns = document.querySelectorAll('[data-clase]');
+  const desc = document.getElementById('clase-concepto-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-clase="' + concepto + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    class: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">class</p><p>Una plantilla que define qué propiedades y métodos tendrá un objeto. No es un objeto en sí, es el plano para crearlos.</p></div>',
+    constructor: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">constructor</p><p>Se ejecuta una sola vez al crear el objeto con new. Recibe parámetros iniciales y los asigna como propiedades.</p></div>',
+    extends: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">extends</p><p>Permite que una clase hija herede propiedades y métodos de una clase padre, sin duplicar código.</p></div>',
+    super: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">super()</p><p>Llama al constructor de la clase padre. Debe ser la primera línea del constructor de la clase hija.</p></div>'
+  };
+
+  desc.innerHTML = datos[concepto];
+};
+
+// --- Tarjeta 3: define() vs class+init() ---
+window.compararDefinicionModelo = function(forma) {
+  const btnDefine = document.getElementById('btn-define');
+  const btnInit = document.getElementById('btn-init');
+  const desc = document.getElementById('definicion-modelo-desc');
+
+  btnDefine.classList.toggle('simbolo-activo', forma === 'define');
+  btnDefine.classList.toggle('simbolo-inactivo', forma !== 'define');
+  btnInit.classList.toggle('simbolo-activo', forma === 'init');
+  btnInit.classList.toggle('simbolo-inactivo', forma !== 'init');
+
+  if (forma === 'define') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">sequelize.define(nombre, atributos)</p><p>Enfoque funcional: Sequelize crea la clase por ti automáticamente.</p><p style="margin-top:0.4rem;opacity:0.7;">Ideal para: prototipos rápidos, proyectos pequeños, sin lógica de negocio compleja.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">class X extends Model + X.init()</p><p>Enfoque orientado a objetos: tú defines la clase, y la enlazas con init().</p><p style="margin-top:0.4rem;opacity:0.7;">Ideal para: proyectos medianos/grandes, cuando necesitas métodos personalizados, getters, setters.</p></div>';
+  }
+};
+
+// --- Tarjeta 4: CRUD con Sequelize + SQL generado ---
+window.mostrarCrudSequelize = function(metodo) {
+  const btns = document.querySelectorAll('[data-crud2]');
+  const codigo = document.getElementById('crud-sequelize-codigo');
+  const sql = document.getElementById('crud-sequelize-sql');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-crud2="' + metodo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    create: {
+      codigo: '<span class="code-keyword">const</span> nuevo = <span class="code-keyword">await</span> Usuario.<span class="code-method">create</span>({\n  nombre: \'Elena\',\n  email: \'elena@correo.com\'\n});',
+      sql: '<span style="color:#A6C58C;">INSERT INTO usuarios (nombre, email, "createdAt", "updatedAt")\nVALUES ($1, $2, $3, $4) RETURNING *;</span>'
+    },
+    findAll: {
+      codigo: '<span class="code-keyword">const</span> usuarios = <span class="code-keyword">await</span> Usuario.<span class="code-method">findAll</span>();',
+      sql: '<span style="color:#A6C58C;">SELECT id, nombre, email, "createdAt", "updatedAt" FROM usuarios;</span>'
+    },
+    findByPk: {
+      codigo: '<span class="code-keyword">const</span> usuario = <span class="code-keyword">await</span> Usuario.<span class="code-method">findByPk</span>(<span class="code-number">1</span>);',
+      sql: '<span style="color:#A6C58C;">SELECT id, nombre, email, "createdAt", "updatedAt"\nFROM usuarios WHERE id = $1;</span>'
+    },
+    update: {
+      codigo: '<span class="code-keyword">const</span> [filasAfectadas] = <span class="code-keyword">await</span> Usuario.<span class="code-method">update</span>(\n  { nombre: \'Elena Sofía\' },\n  { where: { id: <span class="code-number">1</span> } }\n);',
+      sql: '<span style="color:#A6C58C;">UPDATE usuarios SET nombre = $1, "updatedAt" = $2 WHERE id = $3;</span>'
+    },
+    destroy: {
+      codigo: '<span class="code-keyword">const</span> filasEliminadas = <span class="code-keyword">await</span> Usuario.<span class="code-method">destroy</span>({\n  where: { id: <span class="code-number">1</span> }\n});',
+      sql: '<span style="color:#A6C58C;">DELETE FROM usuarios WHERE id = $1;</span>'
+    }
+  };
+
+  codigo.innerHTML = datos[metodo].codigo;
+  sql.innerHTML = datos[metodo].sql;
+};
+
+// --- Tarjeta 5: hasOne, hasMany, belongsTo ---
+window.mostrarRelacion = function(tipo) {
+  const btns = document.querySelectorAll('[data-rel]');
+  const desc = document.getElementById('relacion-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-rel="' + tipo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    hasOne: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">hasOne</p><p>Relación 1:1. Se declara en el modelo padre para indicar que el modelo hijo contiene la referencia.</p></div>',
+    hasMany: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">hasMany</p><p>Relación 1:N. Se declara en el modelo padre para indicar que puede tener múltiples registros asociados.</p></div>',
+    belongsTo: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">belongsTo</p><p>Se declara en el modelo hijo para establecer el enlace de retorno hacia el padre. Aquí vive la clave foránea.</p></div>'
+  };
+
+  desc.innerHTML = datos[tipo];
+};
+
+// --- Tarjeta 6: métodos autogenerados ---
+window.mostrarMetodoAuto = function(metodo) {
+  const btns = document.querySelectorAll('[data-metodoauto]');
+  const desc = document.getElementById('metodo-auto-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-metodoauto="' + metodo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    add: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">addCurso()</p><p>Inserta una fila nueva en la tabla intermedia para asociar la instancia actual con el registro dado.</p></div>',
+    get: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">getCursos()</p><p>Consulta y devuelve todos los registros relacionados a través de la tabla intermedia.</p></div>',
+    remove: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">removeCurso()</p><p>Elimina la fila de la tabla intermedia que conecta ambas instancias, sin borrar los registros originales.</p></div>'
+  };
+
+  desc.innerHTML = datos[metodo];
+};
+
+// --- Tarjeta 1: los 5 principios de REST ---
+window.mostrarPrincipioRest = function(principio) {
+  const btns = document.querySelectorAll('[data-rest]');
+  const desc = document.getElementById('principio-rest-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-rest="' + principio + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    cliente: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cliente-Servidor</p><p>Separación total: el cliente (interfaz) y el servidor (lógica y datos) evolucionan de forma independiente. React o Flutter pueden consumir el mismo backend Express sin que este sepa cómo se ve la pantalla.</p></div>',
+    stateless: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Stateless</p><p>El servidor no recuerda nada entre peticiones. Cada petición trae toda la información necesaria (como un token JWT). Esto permite escalar a múltiples servidores sin problemas.</p></div>',
+    cache: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cacheable</p><p>Las respuestas se marcan explícitamente como cacheables o no (Cache-Control). Esto permite reutilizar respuestas sin repetir el viaje completo al servidor.</p></div>',
+    uniforme: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Interfaz Uniforme</p><p>Todas las rutas siguen el mismo patrón predecible: mismos verbos HTTP, mismas convenciones de URL, mismos códigos de estado. Es el principio más crítico de REST.</p></div>',
+    capas: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Sistema de Capas</p><p>El cliente no sabe (ni necesita saber) si habla directo con tu servidor o si hay un balanceador, un proxy o un firewall en el medio.</p></div>'
+  };
+
+  desc.innerHTML = datos[principio];
+};
+
+// --- Tarjeta 2: versionamiento URL vs Header ---
+window.compararVersionamiento = function(tipo) {
+  const btnUrl = document.getElementById('btn-version-url');
+  const btnHeader = document.getElementById('btn-version-header');
+  const desc = document.getElementById('version-comparar-desc');
+
+  btnUrl.classList.toggle('simbolo-activo', tipo === 'url');
+  btnUrl.classList.toggle('simbolo-inactivo', tipo !== 'url');
+  btnHeader.classList.toggle('simbolo-activo', tipo === 'header');
+  btnHeader.classList.toggle('simbolo-inactivo', tipo !== 'header');
+
+  if (tipo === 'url') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">/api/v1/usuarios</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Fácil de implementar con express.Router()</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Fácil de cachear (ruta física única por versión)</p><p style="color:#8B3A3A;">✗ Trata el mismo recurso como dos URIs distintas</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">/api/usuarios + header Accept</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Más fiel a la teoría pura de REST</p><p style="color:#8B3A3A;margin-bottom:0.3rem;">✗ Más complejo de implementar (middleware de interceptación)</p><p style="color:#8B3A3A;">✗ No se puede probar cambiando solo la barra de direcciones</p></div>';
+  }
+};
+
+// --- Tarjeta 3: query params por caso de uso ---
+window.mostrarQueryParam = function(caso) {
+  const btns = document.querySelectorAll('[data-qp]');
+  const desc = document.getElementById('query-param-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-qp="' + caso + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    filtrado: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>GET /servidores?estado=activo</code><p style="margin-top:0.4rem;opacity:0.7;">→ WHERE estado = \'activo\'</p></div>',
+    busqueda: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>GET /usuarios?buscar=Andres</code><p style="margin-top:0.4rem;opacity:0.7;">→ búsqueda de texto en uno o varios campos</p></div>',
+    orden: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>GET /logs?ordenarPor=fecha&orden=desc</code><p style="margin-top:0.4rem;opacity:0.7;">→ ORDER BY fecha DESC</p></div>',
+    paginacion: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>GET /productos?pagina=2&limite=50</code><p style="margin-top:0.4rem;opacity:0.7;">→ LIMIT 50 OFFSET 50</p></div>'
+  };
+
+  desc.innerHTML = datos[caso];
+};
+
+// --- Tarjeta 4: routes vs controllers ---
+window.compararRoutesControllers = function(tipo) {
+  const btnRoutes = document.getElementById('btn-routes');
+  const btnControllers = document.getElementById('btn-controllers');
+  const desc = document.getElementById('routes-controllers-desc');
+
+  btnRoutes.classList.toggle('simbolo-activo', tipo === 'routes');
+  btnRoutes.classList.toggle('simbolo-inactivo', tipo !== 'routes');
+  btnControllers.classList.toggle('simbolo-activo', tipo === 'controllers');
+  btnControllers.classList.toggle('simbolo-inactivo', tipo !== 'controllers');
+
+  if (tipo === 'routes') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">/routes</p><p>El mapa de la aplicación. Declara qué URLs existen, qué verbo HTTP las gobierna, y hacia qué controlador dirigir la petición.</p><p style="margin-top:0.4rem;opacity:0.7;">No sabe nada de la base de datos ni de la lógica de negocio.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">/controllers</p><p>Donde vive la lógica real: recibe req y res, consulta la base de datos, maneja errores y construye la respuesta JSON final.</p></div>';
+  }
+};
+
+// --- Tarjeta 5: 400 vs 422 ---
+window.comparar400422 = function(codigo) {
+  const btn400 = document.getElementById('btn-400');
+  const btn422 = document.getElementById('btn-422');
+  const desc = document.getElementById('comparar-400-422-desc');
+
+  btn400.classList.toggle('simbolo-activo', codigo === '400');
+  btn400.classList.toggle('simbolo-inactivo', codigo !== '400');
+  btn422.classList.toggle('simbolo-activo', codigo === '422');
+  btn422.classList.toggle('simbolo-inactivo', codigo !== '422');
+
+  if (codigo === '400') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">400 Bad Request</p><p>Error <strong>sintáctico</strong>. El servidor ni siquiera puede interpretar la petición: un JSON malformado, cabeceras corruptas.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">422 Unprocessable Entity</p><p>Error <strong>semántico</strong>. El JSON se parseó perfecto, pero los valores no cumplen las reglas de negocio (edad negativa, email vacío).</p></div>';
+  }
+};
+
+// --- Tarjeta 5: respuesta estandarizada exito/error ---
+window.mostrarRespuestaEstandar = function(tipo) {
+  const btnExito = document.getElementById('btn-resp-exito');
+  const btnError = document.getElementById('btn-resp-error');
+  const codigo = document.getElementById('respuesta-estandar-codigo');
+
+  btnExito.classList.toggle('simbolo-activo', tipo === 'exito');
+  btnExito.classList.toggle('simbolo-inactivo', tipo !== 'exito');
+  btnError.classList.toggle('simbolo-activo', tipo === 'error');
+  btnError.classList.toggle('simbolo-inactivo', tipo !== 'error');
+
+  if (tipo === 'exito') {
+    codigo.innerHTML = '{\n  <span class="code-string">"status"</span>: <span class="code-string">"success"</span>,\n  <span class="code-string">"code"</span>: <span class="code-number">201</span>,\n  <span class="code-string">"data"</span>: { <span class="code-string">"id"</span>: <span class="code-number">105</span>, <span class="code-string">"email"</span>: <span class="code-string">"dev@ejemplo.com"</span> },\n  <span class="code-string">"message"</span>: <span class="code-string">"Usuario registrado exitosamente."</span>\n}';
+  } else {
+    codigo.innerHTML = '{\n  <span class="code-string">"status"</span>: <span class="code-string">"error"</span>,\n  <span class="code-string">"code"</span>: <span class="code-number">422</span>,\n  <span class="code-string">"data"</span>: { <span class="code-string">"email"</span>: <span class="code-string">"Formato de correo inválido."</span> },\n  <span class="code-string">"message"</span>: <span class="code-string">"Errores en los campos de entrada."</span>\n}';
+  }
+};
+
+// --- Tarjeta 6: consola servidor vs cliente ---
+window.compararAudienciaError = function(audiencia) {
+  const btnServidor = document.getElementById('btn-consola-server');
+  const btnCliente = document.getElementById('btn-cliente-api');
+  const desc = document.getElementById('audiencia-error-desc');
+
+  btnServidor.classList.toggle('simbolo-activo', audiencia === 'servidor');
+  btnServidor.classList.toggle('simbolo-inactivo', audiencia !== 'servidor');
+  btnCliente.classList.toggle('simbolo-activo', audiencia === 'cliente');
+  btnCliente.classList.toggle('simbolo-inactivo', audiencia !== 'cliente');
+
+  if (audiencia === 'servidor') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">console.error(err.stack)</p><p>Contiene la traza completa: archivo, línea exacta, módulos involucrados. Solo va a la consola del servidor, nunca al cliente.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Respuesta JSON genérica</p><p>Solo status, code y un mensaje legible de negocio. Exponer err.stack al cliente es una vulnerabilidad: revela rutas internas y estructura del servidor.</p></div>';
+  }
+};
+
+// --- Tarjeta 2: propiedades de req.files ---
+window.mostrarPropArchivo = function(prop) {
+  const btns = document.querySelectorAll('[data-archivo]');
+  const desc = document.getElementById('prop-archivo-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-archivo="' + prop + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    name: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El nombre original del archivo. Ejemplo: <code>documento.pdf</code></div>',
+    data: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El buffer crudo: los bytes del archivo en memoria, antes de guardarlo en disco.</div>',
+    size: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El peso del archivo en bytes. Se usa para validar límites de tamaño.</div>',
+    mimetype: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El formato del archivo. Ejemplo: <code>image/png</code>, <code>application/pdf</code>.</div>'
+  };
+
+  desc.innerHTML = datos[prop];
+};
+
+// --- Tarjeta 3: las 3 validaciones ---
+window.mostrarValidacionArchivo = function(tipo) {
+  const btns = document.querySelectorAll('[data-valfile]');
+  const desc = document.getElementById('validacion-archivo-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-valfile="' + tipo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    presencia: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Presencia</p><p>¿req.files existe y tiene al menos una clave? Sin esto, tu código podría lanzar TypeError al intentar leer algo indefinido.</p></div>',
+    tipo: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Tipo (MIME)</p><p>¿archivo.mimetype está en tu lista de formatos permitidos? Bloquea scripts ejecutables disfrazados de imágenes.</p></div>',
+    tamano: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Tamaño</p><p>¿archivo.size es menor al límite configurado? Evita agotar el disco o la memoria del servidor.</p></div>'
+  };
+
+  desc.innerHTML = datos[tipo];
+};
+
+// --- Tarjeta 4: Date.now() vs path.extname() ---
+window.mostrarPiezaRenombrado = function(pieza) {
+  const btnDate = document.getElementById('btn-datenow');
+  const btnExt = document.getElementById('btn-extname');
+  const desc = document.getElementById('pieza-renombrado-desc');
+
+  btnDate.classList.toggle('simbolo-activo', pieza === 'datenow');
+  btnDate.classList.toggle('simbolo-inactivo', pieza !== 'datenow');
+  btnExt.classList.toggle('simbolo-activo', pieza === 'extname');
+  btnExt.classList.toggle('simbolo-inactivo', pieza !== 'extname');
+
+  if (pieza === 'datenow') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Date.now()</p><p>Milisegundos desde 1970. Cada instante es único, así que agregarlo al nombre casi garantiza que no se repita.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">path.extname()</p><p>Extrae solo la extensión de un nombre de archivo. path.extname(\'foto.jpg\') devuelve \'.jpg\'. Así el archivo renombrado conserva su tipo.</p></div>';
+  }
+};
+
+// --- Tarjeta 6: partes de la regex /\s+/g ---
+window.mostrarParteRegex = function(parte) {
+  const btns = document.querySelectorAll('[data-regex]');
+  const desc = document.getElementById('parte-regex-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-regex="' + parte + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    s: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>\\s</code>: cualquier espacio en blanco (espacio, tabulación, salto de línea).</div>',
+    mas: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>+</code>: "uno o más" seguidos. Agrupa varios espacios consecutivos como una sola coincidencia.</div>',
+    g: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>g</code> (global): reemplaza TODAS las coincidencias del string, no solo la primera.</div>'
+  };
+
+  desc.innerHTML = datos[parte];
+};
+
+// --- Tarjeta 6: existsSync vs access ---
+window.compararExistsAccess = function(tipo) {
+  const btnSync = document.getElementById('btn-existssync');
+  const btnAsync = document.getElementById('btn-accessasync');
+  const desc = document.getElementById('exists-access-desc');
+
+  btnSync.classList.toggle('simbolo-activo', tipo === 'sync');
+  btnSync.classList.toggle('simbolo-inactivo', tipo !== 'sync');
+  btnAsync.classList.toggle('simbolo-activo', tipo === 'async');
+  btnAsync.classList.toggle('simbolo-inactivo', tipo !== 'async');
+
+  if (tipo === 'sync') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">fs.existsSync()</p><p>Bloquea el hilo de Node mientras consulta el disco. Devuelve true/false directamente.</p><p style="margin-top:0.4rem;color:#8B3A3A;">En rutas con mucho tráfico, congela a todos los demás clientes mientras consulta.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">fs.access()</p><p>Asíncrono, devuelve una promesa. El servidor sigue atendiendo otras peticiones mientras espera la respuesta del disco.</p><p style="margin-top:0.4rem;color:#2D5A1E;">Preferido en producción por no bloquear el Event Loop.</p></div>';
+  }
+};
+
+// --- Tarjeta 1: flujo de JWT ---
+window.avanzarFlujoJwt = function(paso) {
+  const pasos = document.querySelectorAll('.flujo-paso');
+  pasos.forEach((p, i) => {
+    if (i < paso) {
+      p.classList.add('flujo-completado');
+      p.classList.remove('flujo-pendiente', 'flujo-activo');
+    } else if (i === paso) {
+      p.classList.add('flujo-activo');
+      p.classList.remove('flujo-pendiente', 'flujo-completado');
+    } else {
+      p.classList.add('flujo-pendiente');
+      p.classList.remove('flujo-activo', 'flujo-completado');
+    }
+  });
+};
+
+// --- Tarjeta 2: las 3 partes del JWT ---
+window.mostrarParteJwt = function(parte) {
+  const btns = document.querySelectorAll('[data-jwt]');
+  const desc = document.getElementById('parte-jwt-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-jwt="' + parte + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    header: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Header</p><p>Metadatos: typ ("JWT") y alg (el algoritmo de firma, como HS256). Le dice al servidor cómo procesar el token.</p></div>',
+    payload: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Payload</p><p>Los datos del usuario: sub (a quién pertenece), iat (cuándo se creó), exp (cuándo expira). Es público, cualquiera puede leerlo.</p></div>',
+    signature: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Signature</p><p>El sello criptográfico. Se genera con el header + payload + una clave secreta. Si algo cambia, la firma deja de coincidir.</p></div>'
+  };
+
+  desc.innerHTML = datos[parte];
+};
+
+// --- Tarjeta 3: parámetros de jwt.sign() ---
+window.mostrarParamSign = function(param) {
+  const btns = document.querySelectorAll('[data-signparam]');
+  const desc = document.getElementById('param-sign-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-signparam="' + param + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    payload: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">payload</p><p>Los datos a incluir (id, rol). Nunca contraseñas ni datos sensibles: es legible por cualquiera.</p></div>',
+    secret: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">secretOrPrivateKey</p><p>La clave que firma el token. Va en variables de entorno (.env), nunca en el código ni en Git.</p></div>',
+    options: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">options</p><p>Configuración como expiresIn ("15m"). Un tiempo corto limita el daño si el token es robado.</p></div>'
+  };
+
+  desc.innerHTML = datos[param];
+};
+
+// --- Tarjeta 4: pasos del middleware ---
+window.avanzarMiddlewareJwt = function(paso) {
+  const pasos = document.querySelectorAll('.flujo-paso');
+  pasos.forEach((p, i) => {
+    if (i < paso) {
+      p.classList.add('flujo-completado');
+      p.classList.remove('flujo-pendiente', 'flujo-activo');
+    } else if (i === paso) {
+      p.classList.add('flujo-activo');
+      p.classList.remove('flujo-pendiente', 'flujo-completado');
+    } else {
+      p.classList.add('flujo-pendiente');
+      p.classList.remove('flujo-activo', 'flujo-completado');
+    }
+  });
+};
+
+// --- Tarjeta 5: opciones de almacenamiento ---
+window.mostrarStorage = function(tipo) {
+  const btns = document.querySelectorAll('[data-storage]');
+  const desc = document.getElementById('storage-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-storage="' + tipo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    local: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">localStorage</p><p>Persiste incluso si se cierra el navegador. Accesible por cualquier JavaScript de la página.</p></div>',
+    session: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">sessionStorage</p><p>Igual que localStorage, pero se borra al cerrar la pestaña.</p></div>',
+    cookie: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cookies</p><p>El navegador las adjunta automáticamente en cada petición al dominio. Con HttpOnly, JavaScript no puede leerlas.</p></div>'
+  };
+
+  desc.innerHTML = datos[tipo];
+};
+
+// --- Tarjeta 5: XSS vs CSRF ---
+window.compararXssCsrf = function(tipo) {
+  const btnXss = document.getElementById('btn-xss');
+  const btnCsrf = document.getElementById('btn-csrf');
+  const desc = document.getElementById('xss-csrf-desc');
+
+  btnXss.classList.toggle('simbolo-activo', tipo === 'xss');
+  btnXss.classList.toggle('simbolo-inactivo', tipo !== 'xss');
+  btnCsrf.classList.toggle('simbolo-activo', tipo === 'csrf');
+  btnCsrf.classList.toggle('simbolo-inactivo', tipo !== 'csrf');
+
+  if (tipo === 'xss') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">XSS (Cross-Site Scripting)</p><p>Un script malicioso se ejecuta en tu página y lee localStorage.getItem(\'token\'), robándolo directamente.</p><p style="margin-top:0.4rem;opacity:0.7;">Afecta a: localStorage y sessionStorage.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">CSRF (Cross-Site Request Forgery)</p><p>Un sitio malicioso hace que tu navegador envíe una petición a tu API. El navegador adjunta la cookie automáticamente, sin que tú lo notes.</p><p style="margin-top:0.4rem;opacity:0.7;">Afecta a: Cookies (incluso con HttpOnly).</p></div>';
+  }
+};
+
+// --- Tarjeta 1: escalabilidad vertical vs horizontal ---
+window.compararEscalabilidad = function(tipo) {
+  const btnV = document.getElementById('btn-vertical');
+  const btnH = document.getElementById('btn-horizontal');
+  const desc = document.getElementById('escalabilidad-desc');
+
+  btnV.classList.toggle('simbolo-activo', tipo === 'vertical');
+  btnV.classList.toggle('simbolo-inactivo', tipo !== 'vertical');
+  btnH.classList.toggle('simbolo-activo', tipo === 'horizontal');
+  btnH.classList.toggle('simbolo-inactivo', tipo !== 'horizontal');
+
+  if (tipo === 'vertical') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Vertical (Scaling Up)</p><p>Más RAM, más CPU, mejor disco en el MISMO servidor.</p><p style="margin-top:0.4rem;color:#8B3A3A;">Límite: techo físico y económico. Punto único de fallo: si ese servidor cae, todo cae.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Horizontal (Scaling Out)</p><p>Agregar MÁS servidores trabajando en paralelo.</p><p style="margin-top:0.4rem;color:#2D5A1E;">Sin límite real. Si uno cae, los demás siguen atendiendo (con arquitectura stateless).</p></div>';
+  }
+};
+
+// --- Tarjeta 1: algoritmos de balanceo ---
+window.mostrarAlgoritmoBalanceo = function(algo) {
+  const btns = document.querySelectorAll('[data-algo]');
+  const desc = document.getElementById('algoritmo-balanceo-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-algo="' + algo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    round: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Round Robin</p><p>Reparte por turnos: servidor 1, 2, 3, 1, 2, 3... Ideal si todos los servidores y peticiones son equivalentes.</p></div>',
+    least: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Least Connections</p><p>Envía la petición al servidor con menos conexiones activas en ese momento. Ideal cuando las peticiones tardan tiempos muy distintos.</p></div>',
+    iphash: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">IP Hash</p><p>La IP del cliente siempre va al mismo servidor. Se usa cuando se necesitan sesiones "pegajosas" (sticky sessions), no siempre compatible con stateless puro.</p></div>'
+  };
+
+  desc.innerHTML = datos[algo];
+};
+
+// --- Tarjeta 2: piezas del módulo cluster ---
+window.mostrarPiezaCluster = function(pieza) {
+  const btns = document.querySelectorAll('[data-cluster]');
+  const desc = document.getElementById('pieza-cluster-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-cluster="' + pieza + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    isprimary: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">cluster.isPrimary</p><p>true en el proceso principal, false en los workers. Permite separar el código: el principal solo crea y vigila workers.</p></div>',
+    fork: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">cluster.fork()</p><p>Clona el proceso actual, creando un worker con su propio Event Loop y espacio de memoria.</p></div>',
+    cpus: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">os.cpus().length</p><p>Cuántos núcleos tiene el procesador. Se usa para saber cuántos workers crear (uno por núcleo).</p></div>',
+    pid: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">process.pid</p><p>El identificador único del proceso, asignado por el sistema operativo. Útil para saber qué worker atendió cada petición.</p></div>'
+  };
+
+  desc.innerHTML = datos[pieza];
+};
+
+// --- Tarjeta 3: riesgos de node/nodemon en producción ---
+window.mostrarRiesgoProduccion = function(riesgo) {
+  const btns = document.querySelectorAll('[data-riesgo]');
+  const desc = document.getElementById('riesgo-produccion-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-riesgo="' + riesgo + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    crash: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Caída sin recuperación</p><p>Si el proceso se cae, con "node app.js" nadie lo reinicia. La API queda apagada hasta que alguien intervenga manualmente.</p></div>',
+    reinicio: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Vulnerabilidad a reinicios</p><p>Si el servidor físico se reinicia, tu proceso de Node no vuelve a arrancar solo.</p></div>',
+    mononucleo: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Un solo núcleo</p><p>"node app.js" solo usa un núcleo de CPU. Para usar los demás, tendrías que programar clustering manualmente.</p></div>'
+  };
+
+  desc.innerHTML = datos[riesgo];
+};
+
+// --- Tarjeta 3: comandos de PM2 ---
+window.mostrarComandoPm2 = function(cmd) {
+  const btns = document.querySelectorAll('[data-pm2cmd]');
+  const desc = document.getElementById('comando-pm2-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-pm2cmd="' + cmd + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    start: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>pm2 start app.js --name api -i max</code><p style="margin-top:0.4rem;opacity:0.7;">Arranca la app con clustering automático en todos los núcleos.</p></div>',
+    stop: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>pm2 stop api</code><p style="margin-top:0.4rem;opacity:0.7;">Detiene el proceso de forma ordenada, liberando puerto y memoria.</p></div>',
+    list: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>pm2 list</code><p style="margin-top:0.4rem;opacity:0.7;">Panel con todos los procesos activos: estado, CPU, memoria, reinicios.</p></div>',
+    restart: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>pm2 restart api</code><p style="margin-top:0.4rem;opacity:0.7;">Detiene y vuelve a arrancar. Útil para aplicar cambios de configuración.</p></div>'
+  };
+
+  desc.innerHTML = datos[cmd];
+};
+
+// --- Tarjeta 4: SIGINT vs SIGTERM ---
+window.compararSenales = function(senal) {
+  const btnInt = document.getElementById('btn-sigint');
+  const btnTerm = document.getElementById('btn-sigterm');
+  const desc = document.getElementById('senales-desc');
+
+  btnInt.classList.toggle('simbolo-activo', senal === 'sigint');
+  btnInt.classList.toggle('simbolo-inactivo', senal !== 'sigint');
+  btnTerm.classList.toggle('simbolo-activo', senal === 'sigterm');
+  btnTerm.classList.toggle('simbolo-inactivo', senal !== 'sigterm');
+
+  if (senal === 'sigint') {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">SIGINT</p><p>Se dispara cuando presionas Ctrl+C en la terminal. Por defecto, detiene el proceso de inmediato.</p></div>';
+  } else {
+    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">SIGTERM</p><p>La envía un gestor de procesos (como PM2) o un orquestador para pedir un apagado planificado, con tiempo de gracia.</p></div>';
+  }
+};
+
+// --- Tarjeta 4: flujo de apagado seguro ---
+window.avanzarApagado = function(paso) {
+  const pasos = document.querySelectorAll('.flujo-paso');
+  pasos.forEach((p, i) => {
+    if (i < paso) {
+      p.classList.add('flujo-completado');
+      p.classList.remove('flujo-pendiente', 'flujo-activo');
+    } else if (i === paso) {
+      p.classList.add('flujo-activo');
+      p.classList.remove('flujo-pendiente', 'flujo-completado');
+    } else {
+      p.classList.add('flujo-pendiente');
+      p.classList.remove('flujo-activo', 'flujo-completado');
+    }
+  });
+};
+
+// --- Tarjeta 5: decodificar errores comunes ---
+window.mostrarErrorComun = function(err) {
+  const btns = document.querySelectorAll('[data-err]');
+  const desc = document.getElementById('error-comun-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-err="' + err + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    module: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">No encuentra el archivo o paquete importado. Suele ser una ruta mal escrita o un paquete no instalado.</div>',
+    eaddr: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El puerto que intentas usar ya está ocupado por otro proceso.</div>',
+    syntax: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Tu código tiene un error gramatical: falta cerrar una llave, paréntesis o comilla.</div>',
+    ref: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Estás usando una variable o función que nunca fue declarada.</div>',
+    enoent: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Intentas leer, escribir o eliminar un archivo que no existe en esa ruta.</div>'
+  };
+
+  desc.innerHTML = datos[err];
+};
+
+// --- Tarjeta 6: comandos de terminal ---
+window.mostrarComandoTerminal = function(cmd) {
+  const btns = document.querySelectorAll('[data-termcmd]');
+  const desc = document.getElementById('comando-terminal-desc');
+
+  btns.forEach(b => {
+    b.classList.remove('simbolo-activo');
+    b.classList.add('simbolo-inactivo');
+  });
+  const activo = document.querySelector('[data-termcmd="' + cmd + '"]');
+  activo.classList.add('simbolo-activo');
+  activo.classList.remove('simbolo-inactivo');
+
+  const datos = {
+    jobs: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Lista los procesos en segundo plano de la sesión de terminal ACTUAL.</div>',
+    fg: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Trae un proceso de background de vuelta al primer plano.</div>',
+    psaux: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Lista TODOS los procesos del sistema, filtrados por "node". Encuentra procesos huérfanos de cualquier sesión.</div>',
+    kill: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Envía una señal de terminación a ese proceso específico por su PID.</div>'
+  };
+
+  desc.innerHTML = datos[cmd];
 };
 
 renderizarMenu();
