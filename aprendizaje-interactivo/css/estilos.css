@@ -271,13 +271,27 @@ pre.bloque-codigo {
   transition: all 0.3s;
   display: flex; align-items: center; justify-content: center;
 }
-.version-box:hover { border-color: rgba(224, 120, 74, 0.5); transform: translateY(-2px); }
-.version-box.version-activa-major,
-.version-box.version-activa-minor,
-.version-box.version-activa-patch {
+.version-box:hover { transform: translateY(-2px); }
+
+.version-box[data-version="major"]:hover { border-color: rgba(224, 120, 74, 0.5); }
+.version-box[data-version="minor"]:hover { border-color: rgba(91, 139, 212, 0.5); }
+.version-box[data-version="patch"]:hover { border-color: rgba(51, 153, 51, 0.5); }
+.version-box.version-activa-major {
   background: rgba(224, 120, 74, 0.22);
   border-color: rgba(224, 120, 74, 0.5);
   color: #B54F22;
+  transform: scale(1.08);
+}
+.version-box.version-activa-minor {
+  background: rgba(91, 139, 212, 0.22);
+  border-color: rgba(91, 139, 212, 0.5);
+  color: #2c5a9e;
+  transform: scale(1.08);
+}
+.version-box.version-activa-patch {
+  background: rgba(51, 153, 51, 0.22);
+  border-color: rgba(51, 153, 51, 0.5);
+  color: #1a4d1a;
   transform: scale(1.08);
 }
 .version-dot { font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; color: #9a9480; align-self: flex-end; margin-bottom: 0.6rem; }

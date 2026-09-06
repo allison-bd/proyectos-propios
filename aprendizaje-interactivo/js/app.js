@@ -123,13 +123,13 @@ function actualizarVista() {
   const nombreCapa = esEjercicio ? 'Ponlo a prueba' : tarjeta.capas[pasoActual].nombre;
 
   headerFase.innerHTML = `
-    <div class="flex items-center gap-3.5 px-4 py-3">
+    <div class="flex items-center gap-3.5 px-4 pt-3 pb-1">
       <button class="btn-retroceder w-[42px] h-[42px] rounded-full bg-white/55 backdrop-blur-[12px] border border-white/75 flex items-center justify-center shrink-0 transition-colors hover:bg-white/75">
         ${flechaIzq}
       </button>
       <div class="flex items-center gap-1.5 flex-1 mx-2">
         ${Array.from({ length: total }, (_, i) => `
-          <div class="flex-1 h-2 rounded-full transition-colors ${i <= pasoActual ? 'bg-[#2E852E]/60' : 'bg-white/50'} ${i === pasoActual ? 'ring-4 ring-[#2E852E]/25' : ''}"></div>
+          <div class="flex-1 h-2 rounded-full transition-colors ${i <= pasoActual ? 'bg-[#339933]/55' : 'bg-white/50'} ${i === pasoActual ? 'ring-4 ring-[#339933]/25' : ''}"></div>
         `).join('')}
       </div>
       ${esUltimoDeUltima
@@ -139,19 +139,19 @@ function actualizarVista() {
     </div>
     <div class="text-center pb-3">
       <h3 class="font-titulo font-bold text-base text-verde-oscuro">${tarjeta.titulo}</h3>
-      <p class="text-xs font-bold text-[#2E852E]">${nombreCapa}</p>
+      <p class="text-xs font-bold text-[#339933]">${nombreCapa}</p>
     </div>
   `;
 
   if (esEjercicio) {
     contenedorTarjetas.innerHTML = `
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
         ${renderizarEjercicio(tarjeta.ejercicio, 0)}
       </div>
     `;
   } else {
     contenedorTarjetas.innerHTML = `
-      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-6">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-6">
         <div class="contenido-capa capa-contenido">
           ${tarjeta.capas[pasoActual].contenido}
         </div>
@@ -562,6 +562,8 @@ window.elegirMotor = function(motor) {
 
   const resultados = {
     ejs: '<div class="text-center"><p style="font-weight:600;color:#33402A;margin-bottom:0.5rem;">Monolito</p><p style="font-size:0.85rem;">El servidor genera HTML completo y lo envía al navegador. El usuario ve la página directamente.</p><pre class="bloque-codigo mt-3"><code><span class="code-comment">// El servidor responde con HTML</span>\nres.<span class="code-method">render</span>(<span class="code-string">\'index\'</span>, { titulo: <span class="code-string">\'Bienvenido\'</span> });</code></pre></div>',
+    pug: '<div class="text-center"><p style="font-weight:600;color:#33402A;margin-bottom:0.5rem;">Monolito</p><p style="font-size:0.85rem;">También genera HTML completo, pero con una sintaxis basada en sangrías, sin necesidad de escribir etiquetas HTML.</p><pre class="bloque-codigo mt-3"><code><span class="code-comment">// Sin etiquetas, solo indentación</span>\nhtml\n  head\n    title= titulo\n  body\n    h1= titulo</code></pre></div>',
+    handlebars: '<div class="text-center"><p style="font-weight:600;color:#33402A;margin-bottom:0.5rem;">Monolito</p><p style="font-size:0.85rem;">También genera HTML completo, usando marcadores de doble llave <code style="white-space:nowrap;">{{ }}</code> para separar la lógica de la vista.</p><pre class="bloque-codigo mt-3"><code>&lt;h1&gt;<span class="code-string">{{titulo}}</span>&lt;/h1&gt;</code></pre></div>',
     none: '<div class="text-center"><p style="font-weight:600;color:#33402A;margin-bottom:0.5rem;">API REST</p><p style="font-size:0.85rem;">El servidor solo devuelve datos JSON. Una app separada (React, app móvil) se encarga de mostrarlos.</p><pre class="bloque-codigo mt-3"><code><span class="code-comment">// El servidor responde con JSON</span>\nres.<span class="code-method">json</span>({ titulo: <span class="code-string">\'Bienvenido\'</span> });</code></pre></div>'
   };
 
@@ -607,10 +609,14 @@ window.toggleModulo = function(sistema) {
   btnEsm.classList.toggle('simbolo-activo', sistema === 'esm');
   btnEsm.classList.toggle('simbolo-inactivo', sistema !== 'esm');
 
+  const explicacion = document.getElementById('modulo-explicacion');
+
   if (sistema === 'cjs') {
     codigo.innerHTML = '<span class="code-comment">// CommonJS — archivo: utils.js</span>\n<span class="code-keyword">const</span> saludar = (nombre) => <span class="code-string">`Hola, ${nombre}`</span>;\n\n<span class="code-keyword">module.exports</span> = { saludar };\n\n<span class="code-comment">// CommonJS — archivo: app.js</span>\n<span class="code-keyword">const</span> { saludar } = <span class="code-method">require</span>(<span class="code-string">\'./utils\'</span>);\n\nconsole.<span class="code-method">log</span>(saludar(<span class="code-string">\'Ana\'</span>));';
+    explicacion.innerHTML = '<div class="recuadro-resaltado" style="text-align:justify;"><strong>require()</strong> se evalúa en <strong>tiempo de ejecución</strong> (dinámico): por eso puedes ponerlo dentro de un <code>if</code> o de una función. Además, es <strong>síncrono</strong>: detiene el archivo hasta que termina de cargar lo que importaste.</div>';
   } else {
     codigo.innerHTML = '<span class="code-comment">// ESM — archivo: utils.js</span>\n<span class="code-keyword">const</span> saludar = (nombre) => <span class="code-string">`Hola, ${nombre}`</span>;\n\n<span class="code-keyword">export</span> { saludar };\n\n<span class="code-comment">// ESM — archivo: app.js</span>\n<span class="code-keyword">import</span> { saludar } <span class="code-keyword">from</span> <span class="code-string">\'./utils.js\'</span>;\n\nconsole.<span class="code-method">log</span>(saludar(<span class="code-string">\'Ana\'</span>));';
+    explicacion.innerHTML = '<div class="recuadro-resaltado" style="text-align:justify;"><strong>import</strong> se resuelve de forma <strong>estática</strong>, antes de que el código empiece a ejecutarse: por eso debe ir siempre al principio del archivo, nunca dentro de un <code>if</code>. Es <strong>asíncrono</strong>: no bloquea el hilo mientras carga, lo que además habilita el "tree-shaking" (eliminar código no usado en producción).</div>';
   }
 };
 
@@ -783,7 +789,7 @@ window.explicarPieza = function(pieza) {
     listen: '<strong><code>server.listen(puerto, callback)</code></strong><br>Pone al servidor a escuchar peticiones en ese puerto. El callback se ejecuta una sola vez cuando el servidor arranca correctamente.'
   };
 
-  desc.innerHTML = '<div style="text-align:left;font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);">' + piezas[pieza] + '</div>';
+  desc.innerHTML = '<div style="text-align:left;font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);">' + piezas[pieza] + '</div>';
 };
 
 // --- Tarjeta: JSON — stringify y parse ---
@@ -810,10 +816,10 @@ window.revelarExpress = function(idx) {
 
   const detalle = document.getElementById('express-detalle');
   const detalles = [
-    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><strong>node:http:</strong> programar if/else manual para cada URL y cada método.<br><strong>Express:</strong> una línea: <code>app.get(\'/usuarios\', fn)</code></div>',
-    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><strong>node:http:</strong> capturar bytes fragmentados, unirlos y convertirlos a JSON manualmente.<br><strong>Express:</strong> una línea: <code>app.use(express.json())</code> y los datos están en <code>req.body</code></div>',
-    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><strong>node:http:</strong> fijar statusCode, setHeader, end() todo a mano.<br><strong>Express:</strong> una línea: <code>res.json(datos)</code> (fija headers, status y cierra)</div>',
-    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><strong>node:http:</strong> copiar y pegar la validación dentro de cada if/else.<br><strong>Express:</strong> <code>app.use(miMiddleware)</code> se ejecuta para todas las rutas automáticamente</div>'
+    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><strong>node:http:</strong> programar if/else manual para cada URL y cada método.<br><strong>Express:</strong> una línea: <code>app.get(\'/usuarios\', fn)</code></div>',
+    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><strong>node:http:</strong> capturar bytes fragmentados, unirlos y convertirlos a JSON manualmente.<br><strong>Express:</strong> una línea: <code>app.use(express.json())</code> y los datos están en <code>req.body</code></div>',
+    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><strong>node:http:</strong> fijar statusCode, setHeader, end() todo a mano.<br><strong>Express:</strong> una línea: <code>res.json(datos)</code> (fija headers, status y cierra)</div>',
+    '<div style="font-size:0.85rem;line-height:1.6;padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><strong>node:http:</strong> copiar y pegar la validación dentro de cada if/else.<br><strong>Express:</strong> <code>app.use(miMiddleware)</code> se ejecuta para todas las rutas automáticamente</div>'
   ];
   detalle.innerHTML = detalles[idx];
 };
@@ -938,9 +944,9 @@ window.compararHilos = function(tipo) {
   btnPool.classList.toggle('simbolo-inactivo', tipo !== 'pool');
 
   if (tipo === 'principal') {
-    resultado.innerHTML = '<div style="text-align:center;padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Hilo principal</p><p style="font-size:0.85rem;">Ejecuta todo tu código JavaScript y tus rutas de Express, <strong>de forma secuencial</strong>, una línea a la vez.</p><p style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Si aquí se bloquea algo, se bloquea toda la aplicación.</p></div>';
+    resultado.innerHTML = '<div style="text-align:center;padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.5rem;">Hilo principal</p><p style="font-size:0.85rem;">Ejecuta todo tu código JavaScript y tus rutas de Express, <strong>de forma secuencial</strong>, una línea a la vez.</p><p style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Si aquí se bloquea algo, se bloquea toda la aplicación.</p></div>';
   } else {
-    resultado.innerHTML = '<div style="text-align:center;padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Thread Pool</p><p style="font-size:0.85rem;">Hilos auxiliares (administrados por <strong>libuv</strong>) que corren en paralelo, fuera del hilo principal, para tareas pesadas como <code>crypto</code> o ciertas operaciones de <code>fs</code>.</p><p style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Al terminar, avisan al Event Loop para que ponga el callback en la cola.</p></div>';
+    resultado.innerHTML = '<div style="text-align:center;padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.5rem;">Thread Pool</p><p style="font-size:0.85rem;">Hilos auxiliares (administrados por <strong>libuv</strong>) que corren en paralelo, fuera del hilo principal, para tareas pesadas como <code>crypto</code> o ciertas operaciones de <code>fs</code>.</p><p style="font-size:0.8rem;opacity:0.7;margin-top:0.5rem;">Al terminar, avisan al Event Loop para que ponga el callback en la cola.</p></div>';
   }
 };
 
@@ -976,9 +982,9 @@ window.mostrarPlantilla = function(tipo) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    partial: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Partial</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Un fragmento de HTML reutilizable. Se guarda una sola vez y se inserta donde se necesite.</p><p style="font-size:0.8rem;opacity:0.7;">Ejemplos típicos: <code>header.hbs</code>, <code>footer.hbs</code></p></div>',
-    layout: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Layout</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">La estructura completa del documento (&lt;html&gt;, &lt;head&gt;, enlaces a CSS). Cada vista se inyecta automáticamente dentro de él.</p><p style="font-size:0.8rem;opacity:0.7;">Evita repetir el esqueleto HTML en cada página.</p></div>',
-    helper: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Helper</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Una función de JavaScript que registras en el motor de plantillas para llamarla directamente desde el HTML de la vista.</p><p style="font-size:0.8rem;opacity:0.7;">Ejemplo: una función que convierte texto a mayúsculas antes de mostrarlo.</p></div>'
+    partial: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.5rem;">Partial</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Un fragmento de HTML reutilizable. Se guarda una sola vez y se inserta donde se necesite.</p><p style="font-size:0.8rem;opacity:0.7;">Ejemplos típicos: <code>header.hbs</code>, <code>footer.hbs</code></p></div>',
+    layout: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.5rem;">Layout</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">La estructura completa del documento (&lt;html&gt;, &lt;head&gt;, enlaces a CSS). Cada vista se inyecta automáticamente dentro de él.</p><p style="font-size:0.8rem;opacity:0.7;">Evita repetir el esqueleto HTML en cada página.</p></div>',
+    helper: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.5rem;">Helper</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Una función de JavaScript que registras en el motor de plantillas para llamarla directamente desde el HTML de la vista.</p><p style="font-size:0.8rem;opacity:0.7;">Ejemplo: una función que convierte texto a mayúsculas antes de mostrarlo.</p></div>'
   };
 
   desc.innerHTML = datos[tipo];
@@ -1031,9 +1037,9 @@ window.mostrarFsMetodo = function(metodo) {
   btnRead.classList.toggle('simbolo-inactivo', metodo !== 'read');
 
   if (metodo === 'write') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;font-family:\'JetBrains Mono\',monospace;">fs.writeFileSync(path, data, options)</p><ul style="padding-left:1.1rem;list-style:disc;"><li><code>path</code>: la ruta donde se crea o sobrescribe el archivo</li><li><code>data</code>: el texto a guardar (normalmente el resultado de JSON.stringify)</li><li><code>options</code>: la codificación, típicamente \'utf8\'</li></ul><p style="margin-top:0.5rem;opacity:0.7;">Devuelve <code>undefined</code>. Si el archivo no existe, lo crea. Si existe, reemplaza TODO su contenido.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;font-family:\'JetBrains Mono\',monospace;">fs.writeFileSync(path, data, options)</p><ul style="padding-left:1.1rem;list-style:disc;"><li><code>path</code>: la ruta donde se crea o sobrescribe el archivo</li><li><code>data</code>: el texto a guardar (normalmente el resultado de JSON.stringify)</li><li><code>options</code>: la codificación, típicamente \'utf8\'</li></ul><p style="margin-top:0.5rem;opacity:0.7;">Devuelve <code>undefined</code>. Si el archivo no existe, lo crea. Si existe, reemplaza TODO su contenido.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;font-family:\'JetBrains Mono\',monospace;">fs.readFileSync(path, options)</p><ul style="padding-left:1.1rem;list-style:disc;"><li><code>path</code>: la ruta del archivo a leer</li><li><code>options</code>: \'utf8\' para obtener texto legible</li></ul><p style="margin-top:0.5rem;opacity:0.7;">Sin \'utf8\', devuelve un <strong>Buffer</strong> (datos binarios), no texto. Con \'utf8\', devuelve un <strong>string</strong> que hay que pasar por JSON.parse() para volver a tener un objeto.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;font-family:\'JetBrains Mono\',monospace;">fs.readFileSync(path, options)</p><ul style="padding-left:1.1rem;list-style:disc;"><li><code>path</code>: la ruta del archivo a leer</li><li><code>options</code>: \'utf8\' para obtener texto legible</li></ul><p style="margin-top:0.5rem;opacity:0.7;">Sin \'utf8\', devuelve un <strong>Buffer</strong> (datos binarios), no texto. Con \'utf8\', devuelve un <strong>string</strong> que hay que pasar por JSON.parse() para volver a tener un objeto.</p></div>';
   }
 };
 
@@ -1091,9 +1097,9 @@ window.mostrarUnlinkAppend = function(metodo) {
   activo.classList.remove('simbolo-inactivo');
 
   if (metodo === 'unlink') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;">fs.unlinkSync(path)</p><p>Elimina el archivo <strong>de forma permanente e irreversible</strong> del disco.</p><p style="margin-top:0.5rem;opacity:0.7;">Siempre verifica con fs.existsSync() antes, o lanzará ENOENT si el archivo ya no existe.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;">fs.unlinkSync(path)</p><p>Elimina el archivo <strong>de forma permanente e irreversible</strong> del disco.</p><p style="margin-top:0.5rem;opacity:0.7;">Siempre verifica con fs.existsSync() antes, o lanzará ENOENT si el archivo ya no existe.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;">fs.appendFileSync(path, data)</p><p>Agrega texto <strong>al final</strong> del archivo, sin borrar lo que ya había. Si el archivo no existe, lo crea.</p><p style="margin-top:0.5rem;opacity:0.7;">Es la base de los sistemas de logs: cada evento nuevo se suma, nunca reemplaza al anterior.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;line-height:1.6;"><p style="font-weight:700;margin-bottom:0.5rem;">fs.appendFileSync(path, data)</p><p>Agrega texto <strong>al final</strong> del archivo, sin borrar lo que ya había. Si el archivo no existe, lo crea.</p><p style="margin-top:0.5rem;opacity:0.7;">Es la base de los sistemas de logs: cada evento nuevo se suma, nunca reemplaza al anterior.</p></div>';
   }
 };
 
@@ -1145,9 +1151,9 @@ window.compararClientPool = function(tipo) {
   btnPool.classList.toggle('simbolo-inactivo', tipo !== 'pool');
 
   if (tipo === 'client') {
-    resultado.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Client</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Un único canal de conexión. Abres con <code>.connect()</code>, consultas, cierras con <code>.end()</code>.</p><p style="font-size:0.8rem;color:#8B3A3A;">Problema: crear y destruir una conexión TCP en cada petición HTTP es costoso. Además, no atiende peticiones en paralelo.</p></div>';
+    resultado.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.5rem;">Client</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Un único canal de conexión. Abres con <code>.connect()</code>, consultas, cierras con <code>.end()</code>.</p><p style="font-size:0.8rem;color:#8B3A3A;">Problema: crear y destruir una conexión TCP en cada petición HTTP es costoso. Además, no atiende peticiones en paralelo.</p></div>';
   } else {
-    resultado.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.5rem;">Pool</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Mantiene varias conexiones activas. Cada consulta toma prestado un cliente y lo devuelve al terminar.</p><p style="font-size:0.8rem;color:#2D5A1E;">Ventaja: evita el costo de crear conexiones nuevas constantemente, y limita cuántas conexiones simultáneas se abren.</p></div>';
+    resultado.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.5rem;">Pool</p><p style="font-size:0.85rem;margin-bottom:0.5rem;">Mantiene varias conexiones activas. Cada consulta toma prestado un cliente y lo devuelve al terminar.</p><p style="font-size:0.8rem;color:#2D5A1E;">Ventaja: evita el costo de crear conexiones nuevas constantemente, y limita cuántas conexiones simultáneas se abren.</p></div>';
   }
 };
 
@@ -1165,9 +1171,9 @@ window.mostrarResultProp = function(prop) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    rows: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.rows</p><p>Un arreglo de objetos. Cada objeto es una fila, y sus propiedades son los nombres de las columnas que pediste en el SELECT.</p></div>',
-    rowCount: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.rowCount</p><p>Un número: cuántas filas devolvió el SELECT, o cuántas se modificaron con INSERT/UPDATE/DELETE.</p></div>',
-    fields: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.fields</p><p>Metadatos de las columnas: nombre, tipo de dato en PostgreSQL, etc. Se usa poco en el día a día.</p></div>'
+    rows: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.rows</p><p>Un arreglo de objetos. Cada objeto es una fila, y sus propiedades son los nombres de las columnas que pediste en el SELECT.</p></div>',
+    rowCount: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.rowCount</p><p>Un número: cuántas filas devolvió el SELECT, o cuántas se modificaron con INSERT/UPDATE/DELETE.</p></div>',
+    fields: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">result.fields</p><p>Metadatos de las columnas: nombre, tipo de dato en PostgreSQL, etc. Se usa poco en el día a día.</p></div>'
   };
 
   desc.innerHTML = datos[prop];
@@ -1230,10 +1236,10 @@ window.mostrarAcid = function(letra) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    a: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.4rem;">Atomicidad</p><p style="font-size:0.85rem;">O se aplican todas las consultas del bloque, o no se aplica ninguna. Todo o nada.</p></div>',
-    c: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.4rem;">Consistencia</p><p style="font-size:0.85rem;">La transacción solo lleva la base de datos de un estado válido a otro, respetando todas las reglas del esquema.</p></div>',
-    i: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.4rem;">Aislamiento</p><p style="font-size:0.85rem;">Una transacción en curso no interfiere ni es visible para otras transacciones que corren al mismo tiempo.</p></div>',
-    d: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);"><p style="font-weight:700;margin-bottom:0.4rem;">Durabilidad</p><p style="font-size:0.85rem;">Una vez confirmada (COMMIT), los cambios sobreviven incluso si el servidor se cae justo después.</p></div>'
+    a: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.4rem;">Atomicidad</p><p style="font-size:0.85rem;">O se aplican todas las consultas del bloque, o no se aplica ninguna. Todo o nada.</p></div>',
+    c: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.4rem;">Consistencia</p><p style="font-size:0.85rem;">La transacción solo lleva la base de datos de un estado válido a otro, respetando todas las reglas del esquema.</p></div>',
+    i: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.4rem;">Aislamiento</p><p style="font-size:0.85rem;">Una transacción en curso no interfiere ni es visible para otras transacciones que corren al mismo tiempo.</p></div>',
+    d: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);"><p style="font-weight:700;margin-bottom:0.4rem;">Durabilidad</p><p style="font-size:0.85rem;">Una vez confirmada (COMMIT), los cambios sobreviven incluso si el servidor se cae justo después.</p></div>'
   };
 
   desc.innerHTML = datos[letra];
@@ -1297,10 +1303,10 @@ window.mostrarConceptoClase = function(concepto) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    class: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">class</p><p>Una plantilla que define qué propiedades y métodos tendrá un objeto. No es un objeto en sí, es el plano para crearlos.</p></div>',
-    constructor: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">constructor</p><p>Se ejecuta una sola vez al crear el objeto con new. Recibe parámetros iniciales y los asigna como propiedades.</p></div>',
-    extends: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">extends</p><p>Permite que una clase hija herede propiedades y métodos de una clase padre, sin duplicar código.</p></div>',
-    super: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">super()</p><p>Llama al constructor de la clase padre. Debe ser la primera línea del constructor de la clase hija.</p></div>'
+    class: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">class</p><p>Una plantilla que define qué propiedades y métodos tendrá un objeto. No es un objeto en sí, es el plano para crearlos.</p></div>',
+    constructor: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">constructor</p><p>Se ejecuta una sola vez al crear el objeto con new. Recibe parámetros iniciales y los asigna como propiedades.</p></div>',
+    extends: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">extends</p><p>Permite que una clase hija herede propiedades y métodos de una clase padre, sin duplicar código.</p></div>',
+    super: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">super()</p><p>Llama al constructor de la clase padre. Debe ser la primera línea del constructor de la clase hija.</p></div>'
   };
 
   desc.innerHTML = datos[concepto];
@@ -1318,9 +1324,9 @@ window.compararDefinicionModelo = function(forma) {
   btnInit.classList.toggle('simbolo-inactivo', forma !== 'init');
 
   if (forma === 'define') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">sequelize.define(nombre, atributos)</p><p>Enfoque funcional: Sequelize crea la clase por ti automáticamente.</p><p style="margin-top:0.4rem;opacity:0.7;">Ideal para: prototipos rápidos, proyectos pequeños, sin lógica de negocio compleja.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">sequelize.define(nombre, atributos)</p><p>Enfoque funcional: Sequelize crea la clase por ti automáticamente.</p><p style="margin-top:0.4rem;opacity:0.7;">Ideal para: prototipos rápidos, proyectos pequeños, sin lógica de negocio compleja.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">class X extends Model + X.init()</p><p>Enfoque orientado a objetos: tú defines la clase, y la enlazas con init().</p><p style="margin-top:0.4rem;opacity:0.7;">Ideal para: proyectos medianos/grandes, cuando necesitas métodos personalizados, getters, setters.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">class X extends Model + X.init()</p><p>Enfoque orientado a objetos: tú defines la clase, y la enlazas con init().</p><p style="margin-top:0.4rem;opacity:0.7;">Ideal para: proyectos medianos/grandes, cuando necesitas métodos personalizados, getters, setters.</p></div>';
   }
 };
 
@@ -1379,9 +1385,9 @@ window.mostrarRelacion = function(tipo) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    hasOne: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">hasOne</p><p>Relación 1:1. Se declara en el modelo padre para indicar que el modelo hijo contiene la referencia.</p></div>',
-    hasMany: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">hasMany</p><p>Relación 1:N. Se declara en el modelo padre para indicar que puede tener múltiples registros asociados.</p></div>',
-    belongsTo: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">belongsTo</p><p>Se declara en el modelo hijo para establecer el enlace de retorno hacia el padre. Aquí vive la clave foránea.</p></div>'
+    hasOne: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">hasOne</p><p>Relación 1:1. Se declara en el modelo padre para indicar que el modelo hijo contiene la referencia.</p></div>',
+    hasMany: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">hasMany</p><p>Relación 1:N. Se declara en el modelo padre para indicar que puede tener múltiples registros asociados.</p></div>',
+    belongsTo: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">belongsTo</p><p>Se declara en el modelo hijo para establecer el enlace de retorno hacia el padre. Aquí vive la clave foránea.</p></div>'
   };
 
   desc.innerHTML = datos[tipo];
@@ -1401,9 +1407,10 @@ window.mostrarMetodoAuto = function(metodo) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    add: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">addCurso()</p><p>Inserta una fila nueva en la tabla intermedia para asociar la instancia actual con el registro dado.</p></div>',
-    get: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">getCursos()</p><p>Consulta y devuelve todos los registros relacionados a través de la tabla intermedia.</p></div>',
-    remove: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">removeCurso()</p><p>Elimina la fila de la tabla intermedia que conecta ambas instancias, sin borrar los registros originales.</p></div>'
+    add: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">addCurso()</p><p>Inserta una fila nueva en la tabla intermedia para asociar la instancia actual con el registro dado.</p></div>',
+    set: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">setCursos()</p><p>Recibe un arreglo de registros: borra TODAS las asociaciones existentes de esta instancia y escribe únicamente las nuevas provistas.</p></div>',
+    get: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">getCursos()</p><p>Consulta y devuelve todos los registros relacionados a través de la tabla intermedia.</p></div>',
+    remove: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">removeCurso()</p><p>Elimina la fila de la tabla intermedia que conecta ambas instancias, sin borrar los registros originales.</p></div>'
   };
 
   desc.innerHTML = datos[metodo];
@@ -1423,11 +1430,11 @@ window.mostrarPrincipioRest = function(principio) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    cliente: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cliente-Servidor</p><p>Separación total: el cliente (interfaz) y el servidor (lógica y datos) evolucionan de forma independiente. React o Flutter pueden consumir el mismo backend Express sin que este sepa cómo se ve la pantalla.</p></div>',
-    stateless: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Stateless</p><p>El servidor no recuerda nada entre peticiones. Cada petición trae toda la información necesaria (como un token JWT). Esto permite escalar a múltiples servidores sin problemas.</p></div>',
-    cache: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cacheable</p><p>Las respuestas se marcan explícitamente como cacheables o no (Cache-Control). Esto permite reutilizar respuestas sin repetir el viaje completo al servidor.</p></div>',
-    uniforme: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Interfaz Uniforme</p><p>Todas las rutas siguen el mismo patrón predecible: mismos verbos HTTP, mismas convenciones de URL, mismos códigos de estado. Es el principio más crítico de REST.</p></div>',
-    capas: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Sistema de Capas</p><p>El cliente no sabe (ni necesita saber) si habla directo con tu servidor o si hay un balanceador, un proxy o un firewall en el medio.</p></div>'
+    cliente: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cliente-Servidor</p><p>Separación total: el cliente (interfaz) y el servidor (lógica y datos) evolucionan de forma independiente. React o Flutter pueden consumir el mismo backend Express sin que este sepa cómo se ve la pantalla.</p></div>',
+    stateless: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Stateless</p><p>El servidor no recuerda nada entre peticiones. Cada petición trae toda la información necesaria (como un token JWT). Esto permite escalar a múltiples servidores sin problemas.</p></div>',
+    cache: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cacheable</p><p>Las respuestas se marcan explícitamente como cacheables o no (Cache-Control). Esto permite reutilizar respuestas sin repetir el viaje completo al servidor.</p></div>',
+    uniforme: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Interfaz Uniforme</p><p>Todas las rutas siguen el mismo patrón predecible: mismos verbos HTTP, mismas convenciones de URL, mismos códigos de estado. Es el principio más crítico de REST.</p></div>',
+    capas: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Sistema de Capas</p><p>El cliente no sabe (ni necesita saber) si habla directo con tu servidor o si hay un balanceador, un proxy o un firewall en el medio.</p></div>'
   };
 
   desc.innerHTML = datos[principio];
@@ -1445,9 +1452,9 @@ window.compararVersionamiento = function(tipo) {
   btnHeader.classList.toggle('simbolo-inactivo', tipo !== 'header');
 
   if (tipo === 'url') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">/api/v1/usuarios</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Fácil de implementar con express.Router()</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Fácil de cachear (ruta física única por versión)</p><p style="color:#8B3A3A;">✗ Trata el mismo recurso como dos URIs distintas</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">/api/v1/usuarios</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Fácil de implementar con express.Router()</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Fácil de cachear (ruta física única por versión)</p><p style="color:#8B3A3A;">✗ Trata el mismo recurso como dos URIs distintas</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">/api/usuarios + header Accept</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Más fiel a la teoría pura de REST</p><p style="color:#8B3A3A;margin-bottom:0.3rem;">✗ Más complejo de implementar (middleware de interceptación)</p><p style="color:#8B3A3A;">✗ No se puede probar cambiando solo la barra de direcciones</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;font-family:\'JetBrains Mono\',monospace;">/api/usuarios + header Accept</p><p style="color:#2D5A1E;margin-bottom:0.3rem;">✓ Más fiel a la teoría pura de REST</p><p style="color:#8B3A3A;margin-bottom:0.3rem;">✗ Más complejo de implementar (middleware de interceptación)</p><p style="color:#8B3A3A;">✗ No se puede probar cambiando solo la barra de direcciones</p></div>';
   }
 };
 
@@ -1465,10 +1472,10 @@ window.mostrarQueryParam = function(caso) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    filtrado: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>GET /servidores?estado=activo</code><p style="margin-top:0.4rem;opacity:0.7;">→ WHERE estado = \'activo\'</p></div>',
-    busqueda: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>GET /usuarios?buscar=Andres</code><p style="margin-top:0.4rem;opacity:0.7;">→ búsqueda de texto en uno o varios campos</p></div>',
-    orden: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>GET /logs?ordenarPor=fecha&orden=desc</code><p style="margin-top:0.4rem;opacity:0.7;">→ ORDER BY fecha DESC</p></div>',
-    paginacion: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>GET /productos?pagina=2&limite=50</code><p style="margin-top:0.4rem;opacity:0.7;">→ LIMIT 50 OFFSET 50</p></div>'
+    filtrado: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>GET /servidores?estado=activo</code><p style="margin-top:0.4rem;opacity:0.7;">→ WHERE estado = \'activo\'</p></div>',
+    busqueda: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>GET /usuarios?buscar=Andres</code><p style="margin-top:0.4rem;opacity:0.7;">→ búsqueda de texto en uno o varios campos</p></div>',
+    orden: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>GET /logs?ordenarPor=fecha&orden=desc</code><p style="margin-top:0.4rem;opacity:0.7;">→ ORDER BY fecha DESC</p></div>',
+    paginacion: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>GET /productos?pagina=2&limite=50</code><p style="margin-top:0.4rem;opacity:0.7;">→ LIMIT 50 OFFSET 50</p></div>'
   };
 
   desc.innerHTML = datos[caso];
@@ -1486,9 +1493,9 @@ window.compararRoutesControllers = function(tipo) {
   btnControllers.classList.toggle('simbolo-inactivo', tipo !== 'controllers');
 
   if (tipo === 'routes') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">/routes</p><p>El mapa de la aplicación. Declara qué URLs existen, qué verbo HTTP las gobierna, y hacia qué controlador dirigir la petición.</p><p style="margin-top:0.4rem;opacity:0.7;">No sabe nada de la base de datos ni de la lógica de negocio.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">/routes</p><p>El mapa de la aplicación. Declara qué URLs existen, qué verbo HTTP las gobierna, y hacia qué controlador dirigir la petición.</p><p style="margin-top:0.4rem;opacity:0.7;">No sabe nada de la base de datos ni de la lógica de negocio.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">/controllers</p><p>Donde vive la lógica real: recibe req y res, consulta la base de datos, maneja errores y construye la respuesta JSON final.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">/controllers</p><p>Donde vive la lógica real: recibe req y res, consulta la base de datos, maneja errores y construye la respuesta JSON final.</p></div>';
   }
 };
 
@@ -1504,9 +1511,9 @@ window.comparar400422 = function(codigo) {
   btn422.classList.toggle('simbolo-inactivo', codigo !== '422');
 
   if (codigo === '400') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">400 Bad Request</p><p>Error <strong>sintáctico</strong>. El servidor ni siquiera puede interpretar la petición: un JSON malformado, cabeceras corruptas.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">400 Bad Request</p><p>Error <strong>sintáctico</strong>. El servidor ni siquiera puede interpretar la petición: un JSON malformado, cabeceras corruptas.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">422 Unprocessable Entity</p><p>Error <strong>semántico</strong>. El JSON se parseó perfecto, pero los valores no cumplen las reglas de negocio (edad negativa, email vacío).</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">422 Unprocessable Entity</p><p>Error <strong>semántico</strong>. El JSON se parseó perfecto, pero los valores no cumplen las reglas de negocio (edad negativa, email vacío).</p></div>';
   }
 };
 
@@ -1540,9 +1547,9 @@ window.compararAudienciaError = function(audiencia) {
   btnCliente.classList.toggle('simbolo-inactivo', audiencia !== 'cliente');
 
   if (audiencia === 'servidor') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">console.error(err.stack)</p><p>Contiene la traza completa: archivo, línea exacta, módulos involucrados. Solo va a la consola del servidor, nunca al cliente.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">console.error(err.stack)</p><p>Contiene la traza completa: archivo, línea exacta, módulos involucrados. Solo va a la consola del servidor, nunca al cliente.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Respuesta JSON genérica</p><p>Solo status, code y un mensaje legible de negocio. Exponer err.stack al cliente es una vulnerabilidad: revela rutas internas y estructura del servidor.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Respuesta JSON genérica</p><p>Solo status, code y un mensaje legible de negocio. Exponer err.stack al cliente es una vulnerabilidad: revela rutas internas y estructura del servidor.</p></div>';
   }
 };
 
@@ -1560,10 +1567,10 @@ window.mostrarPropArchivo = function(prop) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    name: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El nombre original del archivo. Ejemplo: <code>documento.pdf</code></div>',
-    data: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El buffer crudo: los bytes del archivo en memoria, antes de guardarlo en disco.</div>',
-    size: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El peso del archivo en bytes. Se usa para validar límites de tamaño.</div>',
-    mimetype: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El formato del archivo. Ejemplo: <code>image/png</code>, <code>application/pdf</code>.</div>'
+    name: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">El nombre original del archivo. Ejemplo: <code>documento.pdf</code></div>',
+    data: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">El buffer crudo: los bytes del archivo en memoria, antes de guardarlo en disco.</div>',
+    size: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">El peso del archivo en bytes. Se usa para validar límites de tamaño.</div>',
+    mimetype: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">El formato del archivo. Ejemplo: <code>image/png</code>, <code>application/pdf</code>.</div>'
   };
 
   desc.innerHTML = datos[prop];
@@ -1583,9 +1590,9 @@ window.mostrarValidacionArchivo = function(tipo) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    presencia: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Presencia</p><p>¿req.files existe y tiene al menos una clave? Sin esto, tu código podría lanzar TypeError al intentar leer algo indefinido.</p></div>',
-    tipo: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Tipo (MIME)</p><p>¿archivo.mimetype está en tu lista de formatos permitidos? Bloquea scripts ejecutables disfrazados de imágenes.</p></div>',
-    tamano: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Tamaño</p><p>¿archivo.size es menor al límite configurado? Evita agotar el disco o la memoria del servidor.</p></div>'
+    presencia: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Presencia</p><p>¿req.files existe y tiene al menos una clave? Sin esto, tu código podría lanzar TypeError al intentar leer algo indefinido.</p></div>',
+    tipo: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Tipo (MIME)</p><p>¿archivo.mimetype está en tu lista de formatos permitidos? Bloquea scripts ejecutables disfrazados de imágenes.</p></div>',
+    tamano: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Tamaño</p><p>¿archivo.size es menor al límite configurado? Evita agotar el disco o la memoria del servidor.</p></div>'
   };
 
   desc.innerHTML = datos[tipo];
@@ -1603,9 +1610,9 @@ window.mostrarPiezaRenombrado = function(pieza) {
   btnExt.classList.toggle('simbolo-inactivo', pieza !== 'extname');
 
   if (pieza === 'datenow') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Date.now()</p><p>Milisegundos desde 1970. Cada instante es único, así que agregarlo al nombre casi garantiza que no se repita.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Date.now()</p><p>Milisegundos desde 1970. Cada instante es único, así que agregarlo al nombre casi garantiza que no se repita.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">path.extname()</p><p>Extrae solo la extensión de un nombre de archivo. path.extname(\'foto.jpg\') devuelve \'.jpg\'. Así el archivo renombrado conserva su tipo.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">path.extname()</p><p>Extrae solo la extensión de un nombre de archivo. path.extname(\'foto.jpg\') devuelve \'.jpg\'. Así el archivo renombrado conserva su tipo.</p></div>';
   }
 };
 
@@ -1623,9 +1630,9 @@ window.mostrarParteRegex = function(parte) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    s: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>\\s</code>: cualquier espacio en blanco (espacio, tabulación, salto de línea).</div>',
-    mas: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>+</code>: "uno o más" seguidos. Agrupa varios espacios consecutivos como una sola coincidencia.</div>',
-    g: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>g</code> (global): reemplaza TODAS las coincidencias del string, no solo la primera.</div>'
+    s: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>\\s</code>: cualquier espacio en blanco (espacio, tabulación, salto de línea).</div>',
+    mas: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>+</code>: "uno o más" seguidos. Agrupa varios espacios consecutivos como una sola coincidencia.</div>',
+    g: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>g</code> (global): reemplaza TODAS las coincidencias del string, no solo la primera.</div>'
   };
 
   desc.innerHTML = datos[parte];
@@ -1643,9 +1650,9 @@ window.compararExistsAccess = function(tipo) {
   btnAsync.classList.toggle('simbolo-inactivo', tipo !== 'async');
 
   if (tipo === 'sync') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">fs.existsSync()</p><p>Bloquea el hilo de Node mientras consulta el disco. Devuelve true/false directamente.</p><p style="margin-top:0.4rem;color:#8B3A3A;">En rutas con mucho tráfico, congela a todos los demás clientes mientras consulta.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">fs.existsSync()</p><p>Bloquea el hilo de Node mientras consulta el disco. Devuelve true/false directamente.</p><p style="margin-top:0.4rem;color:#8B3A3A;">En rutas con mucho tráfico, congela a todos los demás clientes mientras consulta.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">fs.access()</p><p>Asíncrono, devuelve una promesa. El servidor sigue atendiendo otras peticiones mientras espera la respuesta del disco.</p><p style="margin-top:0.4rem;color:#2D5A1E;">Preferido en producción por no bloquear el Event Loop.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">fs.access()</p><p>Asíncrono, devuelve una promesa. El servidor sigue atendiendo otras peticiones mientras espera la respuesta del disco.</p><p style="margin-top:0.4rem;color:#2D5A1E;">Preferido en producción por no bloquear el Event Loop.</p></div>';
   }
 };
 
@@ -1680,9 +1687,9 @@ window.mostrarParteJwt = function(parte) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    header: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Header</p><p>Metadatos: typ ("JWT") y alg (el algoritmo de firma, como HS256). Le dice al servidor cómo procesar el token.</p></div>',
-    payload: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Payload</p><p>Los datos del usuario: sub (a quién pertenece), iat (cuándo se creó), exp (cuándo expira). Es público, cualquiera puede leerlo.</p></div>',
-    signature: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Signature</p><p>El sello criptográfico. Se genera con el header + payload + una clave secreta. Si algo cambia, la firma deja de coincidir.</p></div>'
+    header: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Header</p><p>Metadatos: typ ("JWT") y alg (el algoritmo de firma, como HS256). Le dice al servidor cómo procesar el token.</p></div>',
+    payload: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Payload</p><p>Los datos del usuario: sub (a quién pertenece), iat (cuándo se creó), exp (cuándo expira). Es público, cualquiera puede leerlo.</p></div>',
+    signature: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Signature</p><p>El sello criptográfico. Se genera con el header + payload + una clave secreta. Si algo cambia, la firma deja de coincidir.</p></div>'
   };
 
   desc.innerHTML = datos[parte];
@@ -1702,9 +1709,9 @@ window.mostrarParamSign = function(param) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    payload: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">payload</p><p>Los datos a incluir (id, rol). Nunca contraseñas ni datos sensibles: es legible por cualquiera.</p></div>',
-    secret: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">secretOrPrivateKey</p><p>La clave que firma el token. Va en variables de entorno (.env), nunca en el código ni en Git.</p></div>',
-    options: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">options</p><p>Configuración como expiresIn ("15m"). Un tiempo corto limita el daño si el token es robado.</p></div>'
+    payload: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">payload</p><p>Los datos a incluir (id, rol). Nunca contraseñas ni datos sensibles: es legible por cualquiera.</p></div>',
+    secret: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">secretOrPrivateKey</p><p>La clave que firma el token. Va en variables de entorno (.env), nunca en el código ni en Git.</p></div>',
+    options: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">options</p><p>Configuración como expiresIn ("15m"). Un tiempo corto limita el daño si el token es robado.</p></div>'
   };
 
   desc.innerHTML = datos[param];
@@ -1741,9 +1748,9 @@ window.mostrarStorage = function(tipo) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    local: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">localStorage</p><p>Persiste incluso si se cierra el navegador. Accesible por cualquier JavaScript de la página.</p></div>',
-    session: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">sessionStorage</p><p>Igual que localStorage, pero se borra al cerrar la pestaña.</p></div>',
-    cookie: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cookies</p><p>El navegador las adjunta automáticamente en cada petición al dominio. Con HttpOnly, JavaScript no puede leerlas.</p></div>'
+    local: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">localStorage</p><p>Persiste incluso si se cierra el navegador. Accesible por cualquier JavaScript de la página.</p></div>',
+    session: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">sessionStorage</p><p>Igual que localStorage, pero se borra al cerrar la pestaña.</p></div>',
+    cookie: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Cookies</p><p>El navegador las adjunta automáticamente en cada petición al dominio. Con HttpOnly, JavaScript no puede leerlas.</p></div>'
   };
 
   desc.innerHTML = datos[tipo];
@@ -1761,9 +1768,9 @@ window.compararXssCsrf = function(tipo) {
   btnCsrf.classList.toggle('simbolo-inactivo', tipo !== 'csrf');
 
   if (tipo === 'xss') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">XSS (Cross-Site Scripting)</p><p>Un script malicioso se ejecuta en tu página y lee localStorage.getItem(\'token\'), robándolo directamente.</p><p style="margin-top:0.4rem;opacity:0.7;">Afecta a: localStorage y sessionStorage.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">XSS (Cross-Site Scripting)</p><p>Un script malicioso se ejecuta en tu página y lee localStorage.getItem(\'token\'), robándolo directamente.</p><p style="margin-top:0.4rem;opacity:0.7;">Afecta a: localStorage y sessionStorage.</p></div><div class="recuadro-resaltado mt-4">localStorage te protege de CSRF pero expone a XSS. Cookies con HttpOnly te protegen de XSS pero exponen a CSRF. Es un balance, no una solución perfecta.</div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">CSRF (Cross-Site Request Forgery)</p><p>Un sitio malicioso hace que tu navegador envíe una petición a tu API. El navegador adjunta la cookie automáticamente, sin que tú lo notes.</p><p style="margin-top:0.4rem;opacity:0.7;">Afecta a: Cookies (incluso con HttpOnly).</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">CSRF (Cross-Site Request Forgery)</p><p>Un sitio malicioso hace que tu navegador envíe una petición a tu API. El navegador adjunta la cookie automáticamente, sin que tú lo notes.</p><p style="margin-top:0.4rem;opacity:0.7;">Afecta a: Cookies (incluso con HttpOnly).</p></div><div class="recuadro-resaltado mt-4">localStorage te protege de CSRF pero expone a XSS. Cookies con HttpOnly te protegen de XSS pero exponen a CSRF. Es un balance, no una solución perfecta.</div>';
   }
 };
 
@@ -1779,9 +1786,9 @@ window.compararEscalabilidad = function(tipo) {
   btnH.classList.toggle('simbolo-inactivo', tipo !== 'horizontal');
 
   if (tipo === 'vertical') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Vertical (Scaling Up)</p><p>Más RAM, más CPU, mejor disco en el MISMO servidor.</p><p style="margin-top:0.4rem;color:#8B3A3A;">Límite: techo físico y económico. Punto único de fallo: si ese servidor cae, todo cae.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Vertical (Scaling Up)</p><p>Más RAM, más CPU, mejor disco en el MISMO servidor.</p><p style="margin-top:0.4rem;color:#8B3A3A;">Límite: techo físico y económico. Punto único de fallo: si ese servidor cae, todo cae.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Horizontal (Scaling Out)</p><p>Agregar MÁS servidores trabajando en paralelo.</p><p style="margin-top:0.4rem;color:#2D5A1E;">Sin límite real. Si uno cae, los demás siguen atendiendo (con arquitectura stateless).</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Horizontal (Scaling Out)</p><p>Agregar MÁS servidores trabajando en paralelo.</p><p style="margin-top:0.4rem;color:#2D5A1E;">Sin límite real. Si uno cae, los demás siguen atendiendo (con arquitectura stateless).</p></div>';
   }
 };
 
@@ -1799,9 +1806,9 @@ window.mostrarAlgoritmoBalanceo = function(algo) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    round: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Round Robin</p><p>Reparte por turnos: servidor 1, 2, 3, 1, 2, 3... Ideal si todos los servidores y peticiones son equivalentes.</p></div>',
-    least: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Least Connections</p><p>Envía la petición al servidor con menos conexiones activas en ese momento. Ideal cuando las peticiones tardan tiempos muy distintos.</p></div>',
-    iphash: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">IP Hash</p><p>La IP del cliente siempre va al mismo servidor. Se usa cuando se necesitan sesiones "pegajosas" (sticky sessions), no siempre compatible con stateless puro.</p></div>'
+    round: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Round Robin</p><p>Reparte por turnos: servidor 1, 2, 3, 1, 2, 3... Ideal si todos los servidores y peticiones son equivalentes.</p></div>',
+    least: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Least Connections</p><p>Envía la petición al servidor con menos conexiones activas en ese momento. Ideal cuando las peticiones tardan tiempos muy distintos.</p></div>',
+    iphash: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">IP Hash</p><p>La IP del cliente siempre va al mismo servidor. Se usa cuando se necesitan sesiones "pegajosas" (sticky sessions), no siempre compatible con stateless puro.</p></div>'
   };
 
   desc.innerHTML = datos[algo];
@@ -1821,10 +1828,10 @@ window.mostrarPiezaCluster = function(pieza) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    isprimary: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">cluster.isPrimary</p><p>true en el proceso principal, false en los workers. Permite separar el código: el principal solo crea y vigila workers.</p></div>',
-    fork: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">cluster.fork()</p><p>Clona el proceso actual, creando un worker con su propio Event Loop y espacio de memoria.</p></div>',
-    cpus: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">os.cpus().length</p><p>Cuántos núcleos tiene el procesador. Se usa para saber cuántos workers crear (uno por núcleo).</p></div>',
-    pid: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">process.pid</p><p>El identificador único del proceso, asignado por el sistema operativo. Útil para saber qué worker atendió cada petición.</p></div>'
+    isprimary: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">cluster.isPrimary</p><p>true en el proceso principal, false en los workers. Permite separar el código: el principal solo crea y vigila workers.</p></div>',
+    fork: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">cluster.fork()</p><p>Clona el proceso actual, creando un worker con su propio Event Loop y espacio de memoria.</p></div>',
+    cpus: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">os.cpus().length</p><p>Cuántos núcleos tiene el procesador. Se usa para saber cuántos workers crear (uno por núcleo).</p></div>',
+    pid: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">process.pid</p><p>El identificador único del proceso, asignado por el sistema operativo. Útil para saber qué worker atendió cada petición.</p></div>'
   };
 
   desc.innerHTML = datos[pieza];
@@ -1844,9 +1851,9 @@ window.mostrarRiesgoProduccion = function(riesgo) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    crash: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Caída sin recuperación</p><p>Si el proceso se cae, con "node app.js" nadie lo reinicia. La API queda apagada hasta que alguien intervenga manualmente.</p></div>',
-    reinicio: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Vulnerabilidad a reinicios</p><p>Si el servidor físico se reinicia, tu proceso de Node no vuelve a arrancar solo.</p></div>',
-    mononucleo: '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Un solo núcleo</p><p>"node app.js" solo usa un núcleo de CPU. Para usar los demás, tendrías que programar clustering manualmente.</p></div>'
+    crash: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Caída sin recuperación</p><p>Si el proceso se cae, con "node app.js" nadie lo reinicia. La API queda apagada hasta que alguien intervenga manualmente.</p></div>',
+    reinicio: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Vulnerabilidad a reinicios</p><p>Si el servidor físico se reinicia, tu proceso de Node no vuelve a arrancar solo.</p></div>',
+    mononucleo: '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">Un solo núcleo</p><p>"node app.js" solo usa un núcleo de CPU. Para usar los demás, tendrías que programar clustering manualmente.</p></div>'
   };
 
   desc.innerHTML = datos[riesgo];
@@ -1866,10 +1873,10 @@ window.mostrarComandoPm2 = function(cmd) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    start: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>pm2 start app.js --name api -i max</code><p style="margin-top:0.4rem;opacity:0.7;">Arranca la app con clustering automático en todos los núcleos.</p></div>',
-    stop: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>pm2 stop api</code><p style="margin-top:0.4rem;opacity:0.7;">Detiene el proceso de forma ordenada, liberando puerto y memoria.</p></div>',
-    list: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>pm2 list</code><p style="margin-top:0.4rem;opacity:0.7;">Panel con todos los procesos activos: estado, CPU, memoria, reinicios.</p></div>',
-    restart: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><code>pm2 restart api</code><p style="margin-top:0.4rem;opacity:0.7;">Detiene y vuelve a arrancar. Útil para aplicar cambios de configuración.</p></div>'
+    start: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>pm2 start app.js --name api -i max</code><p style="margin-top:0.4rem;opacity:0.7;">Arranca la app con clustering automático en todos los núcleos.</p></div>',
+    stop: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>pm2 stop api</code><p style="margin-top:0.4rem;opacity:0.7;">Detiene el proceso de forma ordenada, liberando puerto y memoria.</p></div>',
+    list: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>pm2 list</code><p style="margin-top:0.4rem;opacity:0.7;">Panel con todos los procesos activos: estado, CPU, memoria, reinicios.</p></div>',
+    restart: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><code>pm2 restart api</code><p style="margin-top:0.4rem;opacity:0.7;">Detiene y vuelve a arrancar. Útil para aplicar cambios de configuración.</p></div>'
   };
 
   desc.innerHTML = datos[cmd];
@@ -1887,9 +1894,9 @@ window.compararSenales = function(senal) {
   btnTerm.classList.toggle('simbolo-inactivo', senal !== 'sigterm');
 
   if (senal === 'sigint') {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">SIGINT</p><p>Se dispara cuando presionas Ctrl+C en la terminal. Por defecto, detiene el proceso de inmediato.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">SIGINT</p><p>Se dispara cuando presionas Ctrl+C en la terminal. Por defecto, detiene el proceso de inmediato.</p></div>';
   } else {
-    desc.innerHTML = '<div style="padding:1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">SIGTERM</p><p>La envía un gestor de procesos (como PM2) o un orquestador para pedir un apagado planificado, con tiempo de gracia.</p></div>';
+    desc.innerHTML = '<div style="padding:1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;"><p style="font-weight:700;margin-bottom:0.4rem;">SIGTERM</p><p>La envía un gestor de procesos (como PM2) o un orquestador para pedir un apagado planificado, con tiempo de gracia.</p></div>';
   }
 };
 
@@ -1924,11 +1931,11 @@ window.mostrarErrorComun = function(err) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    module: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">No encuentra el archivo o paquete importado. Suele ser una ruta mal escrita o un paquete no instalado.</div>',
-    eaddr: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">El puerto que intentas usar ya está ocupado por otro proceso.</div>',
-    syntax: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Tu código tiene un error gramatical: falta cerrar una llave, paréntesis o comilla.</div>',
-    ref: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Estás usando una variable o función que nunca fue declarada.</div>',
-    enoent: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Intentas leer, escribir o eliminar un archivo que no existe en esa ruta.</div>'
+    module: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">No encuentra el archivo o paquete importado. Suele ser una ruta mal escrita o un paquete no instalado.</div>',
+    eaddr: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">El puerto que intentas usar ya está ocupado por otro proceso.</div>',
+    syntax: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">Tu código tiene un error gramatical: falta cerrar una llave, paréntesis o comilla.</div>',
+    ref: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">Estás usando una variable o función que nunca fue declarada.</div>',
+    enoent: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">Intentas leer, escribir o eliminar un archivo que no existe en esa ruta.</div>'
   };
 
   desc.innerHTML = datos[err];
@@ -1948,10 +1955,10 @@ window.mostrarComandoTerminal = function(cmd) {
   activo.classList.remove('simbolo-inactivo');
 
   const datos = {
-    jobs: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Lista los procesos en segundo plano de la sesión de terminal ACTUAL.</div>',
-    fg: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Trae un proceso de background de vuelta al primer plano.</div>',
-    psaux: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Lista TODOS los procesos del sistema, filtrados por "node". Encuentra procesos huérfanos de cualquier sesión.</div>',
-    kill: '<div style="padding:0.75rem 1rem;background:white;border-radius:0.5rem;border:1px solid rgba(51,64,42,0.1);font-size:0.85rem;">Envía una señal de terminación a ese proceso específico por su PID.</div>'
+    jobs: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">Lista los procesos en segundo plano de la sesión de terminal ACTUAL.</div>',
+    fg: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">Trae un proceso de background de vuelta al primer plano.</div>',
+    psaux: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">Lista TODOS los procesos del sistema, filtrados por "node". Encuentra procesos huérfanos de cualquier sesión.</div>',
+    kill: '<div style="padding:0.75rem 1rem;background:rgba(255,255,255,.5);backdrop-filter:blur(10px);border-radius:1rem;border:1px solid rgba(255,255,255,.7);font-size:0.85rem;">Envía una señal de terminación a ese proceso específico por su PID.</div>'
   };
 
   desc.innerHTML = datos[cmd];
