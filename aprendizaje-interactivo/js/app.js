@@ -38,6 +38,7 @@ const iconos = {
 const flechaIzq = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"/></svg>';
 const flechaDer = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/></svg>';
 const iconoCheck = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
+const iconoCasa = '<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75"/></svg>';
 
 function renderizarIcono(nombre) {
   return `<svg width="20" height="20" viewBox="0 0 20 20">${iconos[nombre] || iconos.wrench}</svg>`;
@@ -124,6 +125,9 @@ function actualizarVista() {
 
   headerFase.innerHTML = `
     <div class="flex items-center gap-3.5 px-4 pt-3 pb-1">
+      <button class="btn-inicio w-[42px] h-[42px] rounded-full bg-white/55 backdrop-blur-[12px] border border-white/75 flex items-center justify-center shrink-0 transition-colors hover:bg-white/75">
+        ${iconoCasa}
+      </button>
       <button class="btn-retroceder w-[42px] h-[42px] rounded-full bg-white/55 backdrop-blur-[12px] border border-white/75 flex items-center justify-center shrink-0 transition-colors hover:bg-white/75">
         ${flechaIzq}
       </button>
@@ -322,6 +326,7 @@ navFases.addEventListener('click', (e) => {
 });
 
 headerFase.addEventListener('click', (e) => {
+  if (e.target.closest('.btn-inicio')) mostrarMenu();
   if (e.target.closest('.btn-retroceder')) retroceder();
   if (e.target.closest('.btn-avanzar')) avanzar();
 });
@@ -1962,6 +1967,467 @@ window.mostrarComandoTerminal = function(cmd) {
   };
 
   desc.innerHTML = datos[cmd];
+};
+
+// --- Ejercicio genérico: Verdadero o Falso (soporta varias preguntas por pantalla) ---
+window.responderVF = function(elegido, correcta, retroCorrecta, retroIncorrecta, id) {
+  const btnV = document.getElementById('vf-btn-v-' + id);
+  const btnF = document.getElementById('vf-btn-f-' + id);
+  const retro = document.getElementById('vf-retro-' + id);
+
+  if (btnV.disabled) return;
+
+  btnV.disabled = true;
+  btnF.disabled = true;
+
+  const elegidoBtn = elegido === 'verdadero' ? btnV : btnF;
+  const correctoBtn = correcta === 'verdadero' ? btnV : btnF;
+  const esCorrecta = elegido === correcta;
+
+  if (esCorrecta) {
+    elegidoBtn.classList.remove('simbolo-inactivo');
+    elegidoBtn.classList.add('simbolo-activo');
+  } else {
+    elegidoBtn.style.background = 'rgba(224,120,74,.35)';
+    elegidoBtn.style.borderColor = 'rgba(224,120,74,.5)';
+    elegidoBtn.style.color = '#8C3B18';
+    correctoBtn.classList.remove('simbolo-inactivo');
+    correctoBtn.classList.add('simbolo-activo');
+  }
+
+  retro.innerHTML = '<div class="ejercicio-retroalimentacion ' + (esCorrecta ? 'retro-correcta' : 'retro-incorrecta') + '" style="text-align:justify;display:table;margin:0 auto;max-width:90%;">' + (esCorrecta ? retroCorrecta : retroIncorrecta) + '</div>';
+};
+
+// --- Ejercicio genérico: Términos pareados ---
+window._pareadosState = window._pareadosState || {};
+
+window.pareadoClick = function (el) {
+  const contenedor = el.dataset.contenedor;
+  const lado = el.dataset.lado;
+  const par = el.dataset.par;
+  const key = lado + '-' + par;
+
+  if (!window._pareadosState[contenedor]) {
+    window._pareadosState[contenedor] = { seleccionado: null, completados: {}, colores: {} };
+  }
+  const estado = window._pareadosState[contenedor];
+
+  const paleta = [
+    { bg: 'rgba(91,139,212,.35)', border: 'rgba(91,139,212,.55)', color: '#1d3f6e' },
+    { bg: 'rgba(51,153,51,.35)', border: 'rgba(51,153,51,.55)', color: '#1a4d1a' },
+    { bg: 'rgba(230,185,128,.4)', border: 'rgba(230,185,128,.6)', color: '#7A5B00' },
+    { bg: 'rgba(180,140,210,.35)', border: 'rgba(180,140,210,.55)', color: '#4a2e63' },
+    { bg: 'rgba(90,180,170,.35)', border: 'rgba(90,180,170,.55)', color: '#1f4d47' }
+  ];
+  const colorError = { bg: 'rgba(224,120,74,.35)', border: 'rgba(224,120,74,.6)', color: '#8C3B18' };
+
+  function pintar(elemento, c) {
+    elemento.style.background = c.bg;
+    elemento.style.borderColor = c.border;
+    elemento.style.color = c.color;
+  }
+  function limpiar(elemento) {
+    elemento.style.background = '';
+    elemento.style.borderColor = '';
+    elemento.style.color = '';
+  }
+  function colorDe(p) {
+    if (!estado.colores[p]) {
+      const idx = Object.keys(estado.colores).length % paleta.length;
+      estado.colores[p] = paleta[idx];
+    }
+    return estado.colores[p];
+  }
+
+  // Clic sobre una pareja ya completada: deshacerla
+  if (estado.completados[key]) {
+    const otroLado = lado === 'izq' ? 'der' : 'izq';
+    const parEl = document.querySelector('[data-contenedor="' + contenedor + '"][data-lado="' + otroLado + '"][data-par="' + par + '"]');
+    limpiar(el);
+    el.classList.remove('pareado-deshabilitado');
+    if (parEl) { limpiar(parEl); parEl.classList.remove('pareado-deshabilitado'); }
+    delete estado.completados['izq-' + par];
+    delete estado.completados['der-' + par];
+    const svg = document.getElementById('pareados-' + contenedor + '-svg');
+    if (svg) {
+      const linea = svg.querySelector('[data-par="' + par + '"]');
+      if (linea) linea.remove();
+    }
+    const retro = document.getElementById('pareados-' + contenedor + '-retro');
+    if (retro) retro.innerHTML = '';
+    return;
+  }
+
+  // Deshacer la selección en curso
+  if (estado.seleccionado && estado.seleccionado.el === el) {
+    limpiar(el);
+    estado.seleccionado = null;
+    return;
+  }
+
+  // Primer clic, o cambiar de elección dentro del mismo lado
+  if (!estado.seleccionado || estado.seleccionado.lado === lado) {
+    if (estado.seleccionado) limpiar(estado.seleccionado.el);
+    pintar(el, colorDe(par));
+    estado.seleccionado = { el, lado, par };
+    return;
+  }
+
+  const elPrevio = estado.seleccionado.el;
+  const retro = document.getElementById('pareados-' + contenedor + '-retro');
+
+  // Segundo clic, lado opuesto: comparar
+  if (estado.seleccionado.par === par) {
+    const c = colorDe(par);
+    pintar(el, c);
+    pintar(elPrevio, c);
+    el.classList.add('pareado-deshabilitado');
+    elPrevio.classList.add('pareado-deshabilitado');
+    estado.completados['izq-' + par] = true;
+    estado.completados['der-' + par] = true;
+
+    dibujarLineaPareado(contenedor, elPrevio.dataset.lado === 'izq' ? elPrevio : el, elPrevio.dataset.lado === 'izq' ? el : elPrevio, c, par, false);
+
+    const total = document.querySelectorAll('[data-contenedor="' + contenedor + '"][data-lado="izq"]').length;
+    const hechos = Object.keys(estado.completados).length / 2;
+    if (hechos >= total && retro) {
+      retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-correcta" style="display:table;margin:0 auto;">¡Uniste las ' + total + ' parejas correctamente!</div>';
+    }
+    estado.seleccionado = null;
+  } else {
+    // Intento fallido: se dibuja la unión punteada, ambas parpadean, y una pista (sin revelar la respuesta)
+    const elIzq = lado === 'izq' ? el : elPrevio;
+    const elDer = lado === 'izq' ? elPrevio : el;
+    const tempLine = dibujarLineaPareado(contenedor, elIzq, elDer, colorError, 'temp', true);
+
+    pintar(el, colorError);
+    pintar(elPrevio, colorError);
+    el.classList.add('pareado-parpadeo');
+    elPrevio.classList.add('pareado-parpadeo');
+    if (retro) retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-incorrecta" style="display:table;margin:0 auto;">Esa unión no es correcta. Vuelve a intentarlo.</div>';
+
+    estado.seleccionado = null;
+    setTimeout(function () {
+      el.classList.remove('pareado-parpadeo');
+      elPrevio.classList.remove('pareado-parpadeo');
+      limpiar(el);
+      limpiar(elPrevio);
+      if (tempLine) tempLine.remove();
+    }, 900);
+    setTimeout(function () {
+      if (retro) {
+        const caja = retro.querySelector('.ejercicio-retroalimentacion');
+        if (caja) caja.classList.add('retro-desvanecer');
+      }
+    }, 2500);
+    setTimeout(function () {
+      if (retro) retro.innerHTML = '';
+    }, 2900);
+  }
+};
+
+function dibujarLineaPareado(contenedor, elIzq, elDer, color, par, punteada) {
+  const svg = document.getElementById('pareados-' + contenedor + '-svg');
+  if (!svg) return null;
+  const wrapRect = svg.parentElement.getBoundingClientRect();
+  svg.setAttribute('width', wrapRect.width);
+  svg.setAttribute('height', wrapRect.height);
+
+  const rectA = elIzq.getBoundingClientRect();
+  const rectB = elDer.getBoundingClientRect();
+  const x1 = rectA.right - wrapRect.left;
+  const y1 = rectA.top + rectA.height / 2 - wrapRect.top;
+  const x2 = rectB.left - wrapRect.left;
+  const y2 = rectB.top + rectB.height / 2 - wrapRect.top;
+  const mx = (x1 + x2) / 2;
+
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', 'M ' + x1 + ' ' + y1 + ' C ' + mx + ' ' + y1 + ', ' + mx + ' ' + y2 + ', ' + x2 + ' ' + y2);
+  path.setAttribute('stroke', color.border);
+  path.setAttribute('stroke-width', '2');
+  path.setAttribute('fill', 'none');
+  if (punteada) path.setAttribute('stroke-dasharray', '5,5');
+  path.setAttribute('data-par', par);
+  svg.appendChild(path);
+  return path;
+}
+
+// --- Ejercicio genérico: Completar código (con fichas) ---
+window.completarClick = function (el) {
+  const contenedor = el.dataset.contenedor;
+  const blanco = document.getElementById('cc-' + contenedor + '-blanco');
+  const retro = document.getElementById('cc-' + contenedor + '-retro');
+  const fichas = document.querySelectorAll('.cc-ficha[data-contenedor="' + contenedor + '"]');
+
+  if (blanco.classList.contains('cc-correcto')) return;
+
+  const esCorrecta = el.dataset.correcta === 'true';
+
+  if (esCorrecta) {
+    blanco.textContent = el.dataset.valor;
+    blanco.classList.add('cc-correcto');
+    fichas.forEach(function (f) {
+      f.classList.add('cc-deshabilitada');
+      f.onclick = null;
+    });
+    el.classList.add('cc-ficha-correcta');
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-correcta" style="display:table;margin:0 auto;">' + el.dataset.retro + '</div>';
+  } else {
+    blanco.textContent = el.dataset.valor;
+    blanco.classList.add('cc-incorrecto', 'pareado-parpadeo');
+    el.classList.add('cc-ficha-incorrecta');
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-incorrecta" style="display:table;margin:0 auto;">' + el.dataset.retro + '</div>';
+    setTimeout(function () {
+      blanco.textContent = '';
+      blanco.classList.remove('cc-incorrecto', 'pareado-parpadeo');
+      el.classList.remove('cc-ficha-incorrecta');
+    }, 900);
+    setTimeout(function () {
+      const caja = retro.querySelector('.ejercicio-retroalimentacion');
+      if (caja) caja.classList.add('retro-desvanecer');
+    }, 2500);
+    setTimeout(function () {
+      retro.innerHTML = '';
+    }, 2900);
+  }
+};
+
+// --- Ejercicio genérico: Ordena los pasos (arrastrar y soltar) ---
+window.ordenaDragStart = function (e) {
+  e.target.classList.add('ordena-arrastrando');
+  e.target.classList.remove('ordena-correcto', 'ordena-incorrecto');
+  const lista = e.target.closest('.ordena-lista');
+  if (lista) {
+    lista.querySelectorAll('.ordena-item').forEach(function (it) {
+      it.classList.remove('ordena-correcto', 'ordena-incorrecto');
+    });
+    const retro = document.getElementById('ordena-' + lista.dataset.contenedor + '-retro');
+    if (retro) retro.innerHTML = '';
+  }
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', '');
+};
+
+window.ordenaDragEnd = function (e) {
+  e.target.classList.remove('ordena-arrastrando');
+};
+
+window.ordenaDragOver = function (e) {
+  e.preventDefault();
+  const lista = e.currentTarget;
+  const arrastrando = lista.querySelector('.ordena-arrastrando');
+  if (!arrastrando) return;
+  const despues = ordenaElementoDespuesDe(lista, e.clientY);
+  if (despues == null) {
+    lista.appendChild(arrastrando);
+  } else {
+    lista.insertBefore(arrastrando, despues);
+  }
+};
+
+function ordenaElementoDespuesDe(lista, y) {
+  const items = Array.from(lista.querySelectorAll('.ordena-item:not(.ordena-arrastrando)'));
+  return items.reduce(function (mejor, item) {
+    const box = item.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > mejor.offset) {
+      return { offset: offset, element: item };
+    }
+    return mejor;
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+window.comprobarOrden = function (contenedor) {
+  const lista = document.querySelector('.ordena-lista[data-contenedor="' + contenedor + '"]');
+  const correcto = lista.dataset.ordenCorrecto.split(',');
+  const items = Array.from(lista.querySelectorAll('.ordena-item'));
+  let todoCorrecto = true;
+
+  items.forEach(function (item, i) {
+    if (item.dataset.paso === correcto[i]) {
+      item.classList.add('ordena-correcto');
+      item.classList.remove('ordena-incorrecto');
+    } else {
+      item.classList.add('ordena-incorrecto');
+      item.classList.remove('ordena-correcto');
+      todoCorrecto = false;
+    }
+  });
+
+  if (todoCorrecto) {
+    items.forEach(function (item) { item.draggable = false; });
+  }
+
+  const retro = document.getElementById('ordena-' + contenedor + '-retro');
+  if (retro) {
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion ' + (todoCorrecto ? 'retro-correcta' : 'retro-incorrecta') + '" style="display:table;margin:0 auto;">' + (todoCorrecto ? '¡Excelente! Ese es el orden correcto.' : 'Todavía no es el orden correcto. Los pasos en naranja están mal ubicados: arrástralos y vuelve a comprobar.') + '</div>';
+    if (!todoCorrecto) {
+      setTimeout(function () {
+        const caja = retro.querySelector('.ejercicio-retroalimentacion');
+        if (caja) caja.classList.add('retro-desvanecer');
+      }, 2500);
+      setTimeout(function () { retro.innerHTML = ''; }, 2900);
+    }
+  }
+};
+
+// --- Ejercicio genérico: Opción múltiple con caso (embebido como capa) ---
+window.casoMultipleClick = function (el) {
+  const contenedor = el.closest('.ejercicio-opciones');
+  if (contenedor.classList.contains('cm-respondido')) return;
+  contenedor.classList.add('cm-respondido');
+
+  const correcta = parseInt(contenedor.dataset.correcta, 10);
+  const elegida = parseInt(el.dataset.opcion, 10);
+  const opciones = contenedor.querySelectorAll('.ejercicio-opcion');
+  const retro = document.getElementById(contenedor.dataset.retroId);
+  const esCorrecta = elegida === correcta;
+
+  opciones.forEach(function (op, i) {
+    op.style.pointerEvents = 'none';
+    if (i === correcta) op.classList.add('opcion-correcta');
+    else if (i === elegida) op.classList.add('opcion-incorrecta');
+  });
+
+  retro.innerHTML = '<div class="ejercicio-retroalimentacion ' + (esCorrecta ? 'retro-correcta' : 'retro-incorrecta') + '" style="text-align:justify;">' + (esCorrecta ? contenedor.dataset.retroCorrecta : contenedor.dataset.retroIncorrecta) + '</div>';
+};
+
+// --- Ejercicio genérico: Arrastrar a la categoría correcta ---
+window.categDragStart = function (e) {
+  e.target.classList.add('categ-arrastrando');
+  e.target.classList.remove('categ-correcto', 'categ-incorrecto');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', '');
+};
+
+window.categDragEnd = function (e) {
+  e.target.classList.remove('categ-arrastrando');
+};
+
+window.categDragOver = function (e) {
+  e.preventDefault();
+};
+
+window.categDrop = function (e) {
+  e.preventDefault();
+  const zona = e.currentTarget;
+  const arrastrando = document.querySelector('.categ-arrastrando');
+  if (!arrastrando) return;
+  const lista = zona.classList.contains('categ-caja') ? zona.querySelector('.categ-caja-lista') : zona;
+  lista.appendChild(arrastrando);
+
+  const wrap = zona.closest('.categ-wrap');
+  const retro = document.getElementById('categ-' + wrap.dataset.contenedor + '-retro');
+  if (retro) retro.innerHTML = '';
+};
+
+window.comprobarCategorias = function (contenedor) {
+  const wrap = document.querySelector('.categ-wrap[data-contenedor="' + contenedor + '"]');
+  const items = wrap.querySelectorAll('.categ-item');
+  const retro = document.getElementById('categ-' + contenedor + '-retro');
+  let todoColocado = true;
+  let todoCorrecto = true;
+
+  items.forEach(function (item) {
+    const cajaPadre = item.closest('.categ-caja');
+    if (!cajaPadre) {
+      todoColocado = false;
+      item.classList.remove('categ-correcto', 'categ-incorrecto');
+      return;
+    }
+    if (cajaPadre.dataset.categoria === item.dataset.categoria) {
+      item.classList.add('categ-correcto');
+      item.classList.remove('categ-incorrecto');
+    } else {
+      item.classList.add('categ-incorrecto');
+      item.classList.remove('categ-correcto');
+      todoCorrecto = false;
+    }
+  });
+
+  if (!todoColocado) {
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-incorrecta" style="display:table;margin:0 auto;">Todavía te falta ubicar algunos elementos en una categoría.</div>';
+    return;
+  }
+
+  if (todoCorrecto) {
+    items.forEach(function (item) { item.draggable = false; });
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-correcta" style="display:table;margin:0 auto;">¡Clasificaste todo correctamente!</div>';
+  } else {
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-incorrecta" style="display:table;margin:0 auto;">Los elementos en naranja están en la categoría equivocada. Vuelve a intentarlo.</div>';
+    setTimeout(function () {
+      const caja = retro.querySelector('.ejercicio-retroalimentacion');
+      if (caja) caja.classList.add('retro-desvanecer');
+    }, 2500);
+    setTimeout(function () { retro.innerHTML = ''; }, 2900);
+  }
+};
+
+// --- Ejercicio genérico: Encuentra el error ---
+window.eeClick = function (el) {
+  const contenedor = el.dataset.contenedor;
+  const wrap = document.querySelector('.ee-wrap[data-contenedor="' + contenedor + '"]');
+  if (wrap.classList.contains('ee-resuelto')) return;
+
+  const retro = document.getElementById('ee-' + contenedor + '-retro');
+  const esError = el.dataset.error === 'true';
+
+  if (esError) {
+    wrap.classList.add('ee-resuelto');
+    el.classList.add('ee-correcto');
+    wrap.querySelectorAll('.ee-linea').forEach(function (l) {
+      l.style.cursor = 'default';
+      l.onclick = null;
+    });
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-correcta" style="text-align:justify;">' + el.dataset.retro + '</div>';
+  } else {
+    el.classList.add('ee-incorrecto', 'pareado-parpadeo');
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-incorrecta" style="display:table;margin:0 auto;">' + (el.dataset.pista || 'Esa línea está bien. El error está en otra parte.') + '</div>';
+    setTimeout(function () {
+      el.classList.remove('ee-incorrecto', 'pareado-parpadeo');
+    }, 900);
+    setTimeout(function () {
+      const caja = retro.querySelector('.ejercicio-retroalimentacion');
+      if (caja) caja.classList.add('retro-desvanecer');
+    }, 2500);
+    setTimeout(function () { retro.innerHTML = ''; }, 2900);
+  }
+};
+
+// --- Ejercicio genérico: Completar código, Variante B (libre, con pista) ---
+window.comprobarCCB = function (contenedor) {
+  const wrap = document.querySelector('.ccb-wrap[data-contenedor="' + contenedor + '"]');
+  if (wrap.classList.contains('ccb-resuelto')) return;
+
+  const input = document.getElementById('ccb-' + contenedor + '-input');
+  const retro = document.getElementById('ccb-' + contenedor + '-retro');
+  const correctas = wrap.dataset.respuesta.split('|');
+  const respuesta = input.value.trim();
+  const esCorrecta = correctas.some(function (r) { return r === respuesta; });
+
+  if (esCorrecta) {
+    wrap.classList.add('ccb-resuelto');
+    input.classList.add('ccb-correcto');
+    input.disabled = true;
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-correcta" style="display:table;margin:0 auto;">' + wrap.dataset.retroCorrecta + '</div>';
+    const consola = wrap.querySelector('.ccb-consola-salida');
+    if (consola) consola.textContent = wrap.dataset.salida;
+  } else {
+    input.classList.add('ccb-incorrecto', 'pareado-parpadeo');
+    retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-incorrecta" style="display:table;margin:0 auto;">' + wrap.dataset.retroIncorrecta + '</div>';
+    setTimeout(function () {
+      input.classList.remove('ccb-incorrecto', 'pareado-parpadeo');
+    }, 900);
+    setTimeout(function () {
+      const caja = retro.querySelector('.ejercicio-retroalimentacion');
+      if (caja) caja.classList.add('retro-desvanecer');
+    }, 2500);
+    setTimeout(function () { retro.innerHTML = ''; }, 2900);
+  }
+};
+
+window.ccbEnter = function (e, contenedor) {
+  if (e.key === 'Enter') window.comprobarCCB(contenedor);
 };
 
 renderizarMenu();
