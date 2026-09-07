@@ -37,7 +37,7 @@ La construcción de esta guía sigue un proceso repetible:
 
 1. **Definición de tarjetas pequeñas**: cada fase se divide en conceptos acotados (una tarjeta = una idea), para no mezclar demasiado contenido en una sola pantalla.
 2. **Generación de contenido base con NotebookLM**: se cargan las fuentes oficiales (documentación de Node.js, Express, manuales y clases del bootcamp) y se generan explicaciones conceptuales con prompts diseñados para pedir profundidad, evitar analogías forzadas y no dar por sentado ningún término.
-3. **Transformación a formato interactivo**: el contenido generado se revisa, se corrige y se convierte en tarjetas con capas progresivas, elementos interactivos (comparadores, simuladores de consola, diagramas clickeables) y ejercicios de práctica.
+3. **Transformación a formato interactivo**: el contenido generado se revisa, se corrige y se convierte en tarjetas con capas progresivas, elementos interactivos (comparadores, simuladores de consola, diagramas clickeables) y ejercicios de práctica, eligiendo en cada caso el formato de ejercicio que mejor pone a prueba ese contenido específico.
 4. **Revisión iterativa**: cada tarjeta se revisa y se ajusta antes de pasar a la siguiente. No se avanza en bloque.
 
 Este proceso combina herramientas de investigación asistida (NotebookLM) y de desarrollo asistido (Claude) bajo dirección y revisión propia en cada paso: el criterio sobre qué explicar, cómo estructurarlo y qué tan profundo llegar es siempre una decisión personal, no delegada.
@@ -60,9 +60,9 @@ Este proceso combina herramientas de investigación asistida (NotebookLM) y de d
 
 ## Características
 
-- **Formato de tarjeta en capas**: cada tarjeta revela su contenido en pasos (¿Qué es? → El código por dentro → ¿Dónde lo usas?), en vez de mostrar todo de golpe.
+- **Formato de tarjeta en capas**: cada tarjeta revela su contenido en pasos (por ejemplo: ¿Qué es? → cómo funciona → un caso de uso), en vez de mostrar todo de golpe. El ejercicio interactivo de cada tarjeta también vive como una capa más dentro de esa misma secuencia, no como un elemento aparte.
 - **Elementos interactivos por tarjeta**: comparadores de código (por ejemplo, CommonJS vs ESM), simuladores de consola que muestran el resultado real de ejecutar un fragmento, diagramas clickeables, y ejercicios de predicción ("¿qué pasará si...?").
-- **Ejercicios variados**: opción múltiple con retroalimentación explicada tanto en aciertos como en errores.
+- **9 formatos de ejercicio interactivo**, elegidos según el tipo de contenido de cada tarjeta (no aplicados al azar): opción múltiple simple, opción múltiple con caso planteado, verdadero o falso, términos pareados (con líneas conectoras dinámicas), completar código con alternativas, completar código de escritura libre con pista, arrastrar elementos a la categoría correcta, ordenar pasos de un proceso, encontrar el error en un fragmento de código, y predecir la salida de un fragmento antes de ejecutarlo. Todos con retroalimentación explicada tanto en aciertos como en errores.
 - **Sin dependencias de build**: HTML, CSS (Tailwind vía CDN) y JavaScript (ESM) puro, sin framework ni paso de compilación, para mantener el proyecto simple de mantener y desplegar.
 
 ## Stack tecnológico
@@ -75,23 +75,30 @@ Este proceso combina herramientas de investigación asistida (NotebookLM) y de d
 ## Estructura de archivos
 
 ```
-/index.html          → Estructura de la aplicación (menú + vista de estudio)
-/css/estilos.css      → Estilos personalizados (código, tablas, ejercicios, interactivos)
-/js/app.js            → Lógica de navegación, renderizado y funciones interactivas
-/js/datos.js          → Contenido de la Fase 0 y Fase 7
-/js/datos_fase1.js    → Contenido de la Fase 1
-/js/datos_fase2.js    → Contenido de la Fase 2
-/js/datos_fase3.js    → Contenido de la Fase 3
+/index.html           → Estructura de la aplicación (menú + vista de estudio)
+/css/estilos.css       → Estilos personalizados (código, tablas, ejercicios, interactivos)
+/js/app.js             → Lógica de navegación, renderizado y funciones interactivas
+/js/datos.js           → Contenido de la Fase 0
+/js/datos_fase1.js     → Contenido de la Fase 1
+/js/datos_fase2.js     → Contenido de la Fase 2
+/js/datos_fase3.js     → Contenido de la Fase 3
+/js/datos_fase4.js     → Contenido de la Fase 4
+/js/datos_fase5.js     → Contenido de la Fase 5
+/js/datos_fase6.js     → Contenido de la Fase 6
+/js/datos_fase7.js     → Contenido de la Fase 7
+/js/datos_fase8.js     → Contenido de la Fase 8
+/js/datos_fase9.js     → Contenido de la Fase 9
+/js/datos_fase10.js    → Contenido de la Fase 10
 ```
 
-Cada fase vive en su propio archivo de datos para mantener el proyecto ordenado y fácil de ajustar sin tocar el resto. A medida que se agregan las fases 4 a 10, se suman archivos `datos_faseN.js` siguiendo el mismo patrón.
+Cada fase vive en su propio archivo de datos para mantener el proyecto ordenado y fácil de ajustar sin tocar el resto.
 
 ## Estado actual
 
-- ✅ Fases 0, 1, 2 y 3 completas, con contenido interactivo.
-- 🔜 Fases 4 a 10 pendientes de desarrollo (agregadas tras comparar el contenido existente contra el temario completo de los Módulos 6, 7 y 8).
+- ✅ Fases 0 a 10 completas, con contenido conceptual e interactivo.
+- ✅ 9 formatos de ejercicio interactivo diseñados, construidos y aplicados en las 11 fases.
 - 🔜 Despliegue en GitHub Pages.
-- 🔜 Ampliar tipos de ejercicios (verdadero/falso, términos pareados, completar código).
+- 🔜 Adaptar el arrastre (términos pareados, categorías, ordenar pasos) para pantallas táctiles.
 
 ## Cómo verlo
 

@@ -20,6 +20,7 @@ Cada proyecto tiene su propia carpeta con su respectivo README donde se explica 
 |----------|-------------|------|
 | 🍅 [Pomodoro Timer](./pomodoro) | Temporizador Pomodoro interactivo con estética pixel art | [Ver demo](https://allison-bd.github.io/proyectos-propios/pomodoro/) |
 | 🔴 [Pokédex](./pokedex) | Pokédex interactiva con los 151 pokémon, consumo de PokeAPI y estética pixel art | [Ver demo](https://allison-bd.github.io/proyectos-propios/pokedex/) |
+| 📚 [Guía de estudio interactiva: Node.js & Express](./aprendizaje-interactivo) | Guía de estudio interactiva sobre Node.js y Express, con tarjetas en capas y ejercicios de práctica | [Ver demo](https://allison-bd.github.io/proyectos-propios/aprendizaje-interactivo/) |
 
 ## 👩‍💻 Autora
 

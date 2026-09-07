@@ -2153,6 +2153,8 @@ function dibujarLineaPareado(contenedor, elIzq, elDer, color, par, punteada) {
 }
 
 // --- Ejercicio genérico: Completar código (con fichas) ---
+window._completarTimeouts = window._completarTimeouts || {};
+
 window.completarClick = function (el) {
   const contenedor = el.dataset.contenedor;
   const blanco = document.getElementById('cc-' + contenedor + '-blanco');
@@ -2161,12 +2163,19 @@ window.completarClick = function (el) {
 
   if (blanco.classList.contains('cc-correcto')) return;
 
+  if (window._completarTimeouts[contenedor]) {
+    window._completarTimeouts[contenedor].forEach(clearTimeout);
+    window._completarTimeouts[contenedor] = [];
+  }
+
   const esCorrecta = el.dataset.correcta === 'true';
 
   if (esCorrecta) {
     blanco.textContent = el.dataset.valor;
+    blanco.classList.remove('cc-incorrecto', 'pareado-parpadeo');
     blanco.classList.add('cc-correcto');
     fichas.forEach(function (f) {
+      f.classList.remove('cc-ficha-incorrecta');
       f.classList.add('cc-deshabilitada');
       f.onclick = null;
     });
@@ -2177,18 +2186,19 @@ window.completarClick = function (el) {
     blanco.classList.add('cc-incorrecto', 'pareado-parpadeo');
     el.classList.add('cc-ficha-incorrecta');
     retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-incorrecta" style="display:table;margin:0 auto;">' + el.dataset.retro + '</div>';
-    setTimeout(function () {
+
+    const t1 = setTimeout(function () {
       blanco.textContent = '';
       blanco.classList.remove('cc-incorrecto', 'pareado-parpadeo');
       el.classList.remove('cc-ficha-incorrecta');
     }, 900);
-    setTimeout(function () {
+    const t2 = setTimeout(function () {
       const caja = retro.querySelector('.ejercicio-retroalimentacion');
       if (caja) caja.classList.add('retro-desvanecer');
     }, 2500);
-    setTimeout(function () {
-      retro.innerHTML = '';
-    }, 2900);
+    const t3 = setTimeout(function () { retro.innerHTML = ''; }, 2900);
+
+    window._completarTimeouts[contenedor] = [t1, t2, t3];
   }
 };
 
@@ -2237,11 +2247,23 @@ function ordenaElementoDespuesDe(lista, y) {
   }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
+window._ordenaTimeouts = window._ordenaTimeouts || {};
+
 window.comprobarOrden = function (contenedor) {
   const lista = document.querySelector('.ordena-lista[data-contenedor="' + contenedor + '"]');
   const correcto = lista.dataset.ordenCorrecto.split(',');
   const items = Array.from(lista.querySelectorAll('.ordena-item'));
+  const retro = document.getElementById('ordena-' + contenedor + '-retro');
   let todoCorrecto = true;
+
+  if (window._ordenaTimeouts[contenedor]) {
+    window._ordenaTimeouts[contenedor].forEach(clearTimeout);
+    window._ordenaTimeouts[contenedor] = [];
+  }
+  if (retro) {
+    const cajaPrevia = retro.querySelector('.ejercicio-retroalimentacion');
+    if (cajaPrevia) cajaPrevia.classList.remove('retro-desvanecer');
+  }
 
   items.forEach(function (item, i) {
     if (item.dataset.paso === correcto[i]) {
@@ -2258,15 +2280,15 @@ window.comprobarOrden = function (contenedor) {
     items.forEach(function (item) { item.draggable = false; });
   }
 
-  const retro = document.getElementById('ordena-' + contenedor + '-retro');
   if (retro) {
     retro.innerHTML = '<div class="ejercicio-retroalimentacion ' + (todoCorrecto ? 'retro-correcta' : 'retro-incorrecta') + '" style="display:table;margin:0 auto;">' + (todoCorrecto ? '¡Excelente! Ese es el orden correcto.' : 'Todavía no es el orden correcto. Los pasos en naranja están mal ubicados: arrástralos y vuelve a comprobar.') + '</div>';
     if (!todoCorrecto) {
-      setTimeout(function () {
+      const t1 = setTimeout(function () {
         const caja = retro.querySelector('.ejercicio-retroalimentacion');
         if (caja) caja.classList.add('retro-desvanecer');
       }, 2500);
-      setTimeout(function () { retro.innerHTML = ''; }, 2900);
+      const t2 = setTimeout(function () { retro.innerHTML = ''; }, 2900);
+      window._ordenaTimeouts[contenedor] = [t1, t2];
     }
   }
 };
@@ -2364,6 +2386,8 @@ window.comprobarCategorias = function (contenedor) {
 };
 
 // --- Ejercicio genérico: Encuentra el error ---
+window._eeTimeouts = window._eeTimeouts || {};
+
 window.eeClick = function (el) {
   const contenedor = el.dataset.contenedor;
   const wrap = document.querySelector('.ee-wrap[data-contenedor="' + contenedor + '"]');
@@ -2371,6 +2395,14 @@ window.eeClick = function (el) {
 
   const retro = document.getElementById('ee-' + contenedor + '-retro');
   const esError = el.dataset.error === 'true';
+
+  if (window._eeTimeouts[contenedor]) {
+    window._eeTimeouts[contenedor].forEach(clearTimeout);
+    window._eeTimeouts[contenedor] = [];
+  }
+  wrap.querySelectorAll('.ee-linea.ee-incorrecto').forEach(function (l) {
+    l.classList.remove('ee-incorrecto', 'pareado-parpadeo');
+  });
 
   if (esError) {
     wrap.classList.add('ee-resuelto');
@@ -2383,14 +2415,17 @@ window.eeClick = function (el) {
   } else {
     el.classList.add('ee-incorrecto', 'pareado-parpadeo');
     retro.innerHTML = '<div class="ejercicio-retroalimentacion retro-incorrecta" style="display:table;margin:0 auto;">' + (el.dataset.pista || 'Esa línea está bien. El error está en otra parte.') + '</div>';
-    setTimeout(function () {
+
+    const t1 = setTimeout(function () {
       el.classList.remove('ee-incorrecto', 'pareado-parpadeo');
     }, 900);
-    setTimeout(function () {
+    const t2 = setTimeout(function () {
       const caja = retro.querySelector('.ejercicio-retroalimentacion');
       if (caja) caja.classList.add('retro-desvanecer');
     }, 2500);
-    setTimeout(function () { retro.innerHTML = ''; }, 2900);
+    const t3 = setTimeout(function () { retro.innerHTML = ''; }, 2900);
+
+    window._eeTimeouts[contenedor] = [t1, t2, t3];
   }
 };
 
